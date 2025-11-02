@@ -39,30 +39,25 @@ const NewsCard: React.FC<NewsCardProps> = ({ article, onClick }) => {
         onKeyDown={onKeyActivate}
         className="w-full text-left cursor-pointer"
       >
-        {article.imageUrl && (
-          <div className="relative w-full h-48 sm:h-52 md:h-48 bg-gradient-to-br from-gray-100 to-gray-50 overflow-hidden">
-            <img 
-              src={article.imageUrl} 
-              alt={title} 
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
-              onError={(e) => {
-                const img = e.currentTarget as HTMLImageElement;
-                if (img.dataset.fallbackApplied !== 'true') {
-                  img.src = 'https://placehold.co/800x480?text=News';
-                  img.dataset.fallbackApplied = 'true';
-                }
-              }}
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-          </div>
-        )}
+        <div className="relative w-full h-48 sm:h-52 md:h-48 bg-gradient-to-br from-gray-100 to-gray-50 overflow-hidden">
+          <img 
+            src={article.imageUrl || 'https://placehold.co/800x480/dc2626/ffffff?text=News'} 
+            alt={title} 
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+            onError={(e) => {
+              const img = e.currentTarget as HTMLImageElement;
+              if (img.dataset.fallbackApplied !== 'true') {
+                img.src = 'https://placehold.co/800x480/dc2626/ffffff?text=News';
+                img.dataset.fallbackApplied = 'true';
+              }
+            }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        </div>
         <div className="p-4 sm:p-5">
           <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-2 sm:mb-2.5 line-clamp-2 group-hover:text-red-600 transition-colors duration-200 leading-snug">
             {title}
           </h3>
-          {article.description && (
-            <p className="text-sm text-gray-600 mb-3 sm:mb-4 line-clamp-3 leading-relaxed">{article.description}</p>
-          )}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 pt-3 border-t border-gray-100">
             <div className="text-xs text-gray-500 flex items-center font-medium">
               <span className="text-gray-700 font-semibold">{article.source}</span>

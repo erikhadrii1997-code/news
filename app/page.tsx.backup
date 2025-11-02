@@ -1,0 +1,387 @@
+'use client';
+
+import { Suspense, useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { useNews } from '../hooks/useNews';
+import SiteNavbar from '../components/SiteNavbar';
+import NewsCard from '../components/NewsCard';
+import LoadingSpinner from '../components/LoadingSpinner';
+import ArticleView from '../components/ArticleView';
+import { NewsItem } from '../lib/types';
+
+function HomePageContent() {
+  const params = useSearchParams();
+  const [currentCategory, setCurrentCategory] = useState('general');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedArticle, setSelectedArticle] = useState<NewsItem | null>(null);
+
+  const { news, loading, error } = useNews({
+    category: currentCategory,
+    query: searchQuery,
+    pageSize: 100,
+  });
+
+  // Filter out any known-bad article
+  const filteredNews = news.filter((item) => {
+    const t = (item.title || '').toLowerCase();
+    const isDodgersBlueJays = t.includes('dodgers') && t.includes('blue jays');
+    return !isDodgersBlueJays;
+  });
+
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    if (query) {
+      setCurrentCategory('general');
+    }
+  };
+
+  const handleCategoryChange = (category: string) => {
+    setCurrentCategory(category);
+    setSearchQuery('');
+  };
+
+  // Reflect URL cat param into state
+  useEffect(() => {
+    const cat = params.get('cat');
+    if (cat && cat !== currentCategory) {
+      setCurrentCategory(cat);
+      setSearchQuery('');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params]);
+
+  const getSectionTitle = () => {
+    if (searchQuery) return `Search Results for "${searchQuery}"`;
+    const categoryLabels: { [key: string]: string } = {
+      general: 'Latest News',
+      breaking: 'Breaking News',
+      technology: 'Technology',
+      business: 'Business',
+      science: 'Science',
+      health: 'Health',
+      sports: 'Sports',
+      entertainment: 'Entertainment',
+    };
+    return categoryLabels[currentCategory] || 'Latest News';
+  };
+
+  // Split articles: Featured (first 3), Main feed (next items), Sidebar (most popular)
+  const featuredArticles = filteredNews.slice(0, 3);
+  const mainFeedArticles = filteredNews.slice(3, 20);
+  const sidebarArticles = filteredNews.slice(20, 25);
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    
+    if (diffHours < 24) {
+      return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    }
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  };
+
+  return (
+    <div className="min-h-screen bg-white">
+      <SiteNavbar
+        onSearch={handleSearch}
+        onCategoryChange={handleCategoryChange}
+        currentCategory={currentCategory}
+      />
+
+      <main className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {loading && <LoadingSpinner />}
+
+        {!loading && filteredNews.length > 0 && (
+          <>
+            {/* Section Title */}
+            <div className="mb-6">
+              <h1 className="text-2xl sm:text-3xl font-black text-gray-900 uppercase tracking-tight">
+                {getSectionTitle()}
+              </h1>
+            </div>
+
+            {/* Featured Section - Kyiv Independent Style */}
+            {featuredArticles.length > 0 && (
+              <section className="mb-10 border-b border-gray-200 pb-10">
+                <h2 className="text-sm font-black text-gray-500 uppercase tracking-wider mb-5">FEATURED</h2>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {featuredArticles.map((article) => (
+                    <article
+                      key={article.id}
+                      className="group cursor-pointer"
+                      onClick={() => setSelectedArticle(article)}
+                    >
+                      <div className="relative aspect-[16/10] overflow-hidden mb-3 bg-gray-100">
+                        <img
+                          src={article.imageUrl}
+                          alt={article.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      </div>
+                      <time className="text-xs text-gray-500 font-medium">
+                        {new Date(article.publishedAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}
+                      </time>
+                      <h3 className="text-lg font-bold text-gray-900 mt-2 group-hover:text-red-600 transition-colors leading-snug">
+                        {article.title}
+                      </h3>
+                    </article>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* Main Content with Sidebar Layout */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+              {/* Main News Feed - Left Column */}
+              <div className="lg:col-span-2">
+                <h2 className="text-sm font-black text-gray-500 uppercase tracking-wider mb-5">NEWS FEED</h2>
+                <div className="space-y-6">
+                  {mainFeedArticles.map((article) => (
+                    <article
+                      key={article.id}
+                      className="group cursor-pointer pb-6 border-b border-gray-100 last:border-0"
+                      onClick={() => setSelectedArticle(article)}
+                    >
+                      <div className="flex gap-4">
+                        <div className="flex-shrink-0 w-32 h-32 sm:w-40 sm:h-40 bg-gray-100 overflow-hidden">
+                          <img
+                            src={article.imageUrl}
+                            alt={article.title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <time className="text-xs text-gray-500 font-medium">
+                            {formatDate(article.publishedAt)}
+                          </time>
+                          <h3 className="text-lg sm:text-xl font-bold text-gray-900 mt-1 mb-2 group-hover:text-red-600 transition-colors leading-tight">
+                            {article.title}
+                          </h3>
+                          <p className="text-sm text-gray-600 line-clamp-2 leading-relaxed">
+                            {article.description}
+                          </p>
+                        </div>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+
+                {/* Load More Button */}
+                {filteredNews.length > 20 && (
+                  <button 
+                    className="w-full mt-8 py-3 border-2 border-gray-200 rounded-lg font-bold text-gray-700 hover:border-red-600 hover:text-red-600 transition-colors"
+                    onClick={() => {
+                      // Scroll to show more articles
+                      window.scrollBy({ top: 400, behavior: 'smooth' });
+                    }}
+                  >
+                    SHOW MORE
+                  </button>
+                )}
+              </div>
+
+              {/* Sidebar - Right Column */}
+              <aside className="lg:col-span-1">
+                <div className="sticky top-24">
+                  <h2 className="text-sm font-black text-gray-500 uppercase tracking-wider mb-5">MOST POPULAR</h2>
+                  <div className="space-y-5">
+                    {sidebarArticles.map((article, index) => (
+                      <article
+                        key={article.id}
+                        className="group cursor-pointer flex gap-3"
+                        onClick={() => setSelectedArticle(article)}
+                      >
+                        <span className="flex-shrink-0 text-2xl font-black text-gray-200 group-hover:text-red-600 transition-colors">
+                          {index + 1}.
+                        </span>
+                        <div>
+                          <h3 className="text-base font-bold text-gray-900 group-hover:text-red-600 transition-colors leading-snug">
+                            {article.title}
+                          </h3>
+                        </div>
+                      </article>
+                    ))}
+                  </div>
+
+                  {/* Additional Sidebar Section */}
+                  <div className="mt-10 p-6 bg-gray-50 rounded-lg">
+                    <h3 className="text-sm font-black text-gray-900 uppercase tracking-wider mb-3">
+                      EDITORS' PICKS
+                    </h3>
+                    <div className="space-y-4">
+                      {filteredNews.slice(25, 28).map((article) => (
+                        <div
+                          key={article.id}
+                          className="group cursor-pointer"
+                          onClick={() => setSelectedArticle(article)}
+                        >
+                          <div className="relative aspect-[16/9] overflow-hidden mb-2 bg-gray-100 rounded">
+                            <img
+                              src={article.imageUrl}
+                              alt={article.title}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          <h4 className="text-sm font-bold text-gray-900 group-hover:text-red-600 transition-colors leading-snug">
+                            {article.title}
+                          </h4>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </aside>
+            </div>
+
+            {/* Bottom Grid Section */}
+            {filteredNews.length > 28 && (
+              <section className="mt-12 pt-10 border-t border-gray-200">
+                <h2 className="text-sm font-black text-gray-500 uppercase tracking-wider mb-5">MORE NEWS</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {filteredNews.slice(28).map((article) => (
+                    <NewsCard
+                      key={article.id}
+                      article={article}
+                      onClick={() => setSelectedArticle(article)}
+                    />
+                  ))}
+                </div>
+              </section>
+            )}
+          </>
+        )}
+
+        {!loading && filteredNews.length === 0 && (
+          <div className="text-center py-20">
+            <h3 className="text-3xl font-bold text-gray-900 mb-4">No articles found</h3>
+            <p className="text-lg text-gray-600">
+              {searchQuery
+                ? `No results for "${searchQuery}"`
+                : 'No articles available in this category'}
+            </p>
+          </div>
+        )}
+      </main>
+
+      {selectedArticle && (
+        <ArticleView article={selectedArticle} onClose={() => setSelectedArticle(null)} />
+      )}
+    </div>
+  );
+}
+                      <>
+                        <img
+                          src={topArticle.imageUrl}
+                          alt={topArticle.title}
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                          onError={(e) => {
+                            const img = e.currentTarget as HTMLImageElement;
+                            if (img.dataset.fallbackApplied !== 'true') {
+                              img.src = 'https://placehold.co/1200x800?text=News';
+                              img.dataset.fallbackApplied = 'true';
+                            }
+                          }}
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+                      </>
+                    )}
+                  </button>
+
+                  <div className="flex flex-col justify-center">
+                    <div
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => setSelectedArticle(topArticle)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          setSelectedArticle(topArticle);
+                        }
+                      }}
+                      className="text-left group cursor-pointer"
+                    >
+                      <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-gray-900 mb-4 sm:mb-5 leading-tight group-hover:text-red-600 transition-colors duration-300">
+                        {topArticle.title}
+                      </h2>
+                      <p className="text-base sm:text-lg text-gray-700 mb-4 sm:mb-6 line-clamp-3 sm:line-clamp-4 leading-relaxed">
+                        {topArticle.description}
+                      </p>
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 text-sm">
+                        <div className="flex items-center text-gray-600 font-medium">
+                          <span className="text-gray-900 font-bold">{topArticle.source}</span>
+                          <span className="mx-2 sm:mx-3 text-gray-300">•</span>
+                          <span>
+                            {new Date(topArticle.publishedAt).toLocaleDateString('en-US', {
+                              month: 'short',
+                              day: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            })}
+                          </span>
+                        </div>
+                        <a
+                          href={`/read?u=${encodeURIComponent(topArticle.url)}&t=${encodeURIComponent(topArticle.title)}&d=${encodeURIComponent(topArticle.description || '')}&i=${encodeURIComponent(topArticle.imageUrl || '')}&p=${encodeURIComponent(topArticle.publishedAt)}&s=${encodeURIComponent(topArticle.source)}`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                          }}
+                          className="w-full sm:w-auto text-center px-6 py-2.5 rounded-lg text-sm font-bold bg-red-600 text-white hover:bg-red-700 hover:shadow-lg hover:shadow-red-600/30 transition-all duration-200 active:scale-95 touch-manipulation"
+                          aria-label="Open top article"
+                        >
+                          Open
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 lg:gap-7">
+              {otherArticles.map((article) => (
+                <NewsCard
+                  key={article.id}
+                  article={article}
+                  onClick={() => setSelectedArticle(article)}
+                />
+              ))}
+            </div>
+          </>
+        )}
+
+        {!loading && filteredNews.length === 0 && (
+          <div className="text-center py-20">
+            <h3 className="text-3xl font-bold text-gray-900 mb-4">No articles found</h3>
+            <p className="text-lg text-gray-600">
+              {searchQuery
+                ? `No results for "${searchQuery}"`
+                : 'No articles available in this category'}
+            </p>
+          </div>
+        )}
+      </main>
+
+      {selectedArticle && (
+        <ArticleView article={selectedArticle} onClose={() => setSelectedArticle(null)} />
+      )}
+    </div>
+  );
+}
+
+export default function HomePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white">
+        <div className="flex items-center justify-center h-screen">
+          <div className="flex items-center text-gray-600">
+            <div className="w-6 h-6 border-3 border-gray-200 border-t-red-600 rounded-full animate-spin mr-4" />
+            <span className="text-lg font-medium">Loading news…</span>
+          </div>
+        </div>
+      </div>
+    }>
+      <HomePageContent />
+    </Suspense>
+  );
+}

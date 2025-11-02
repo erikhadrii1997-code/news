@@ -15,6 +15,33 @@ function ReadPageContent() {
   const [content, setContent] = useState<string>(description);
   const [loading, setLoading] = useState<boolean>(true);
 
+  // Get a fallback image based on title content
+  const getFallbackImage = () => {
+    const titleLower = title.toLowerCase();
+    
+    if (titleLower.includes('tech') || titleLower.includes('ai') || titleLower.includes('computer')) {
+      return 'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=800&q=80';
+    } else if (titleLower.includes('business') || titleLower.includes('market') || titleLower.includes('economy')) {
+      return 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&q=80';
+    } else if (titleLower.includes('sport') || titleLower.includes('football') || titleLower.includes('soccer')) {
+      return 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800&q=80';
+    } else if (titleLower.includes('health') || titleLower.includes('medical')) {
+      return 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&q=80';
+    } else if (titleLower.includes('entertainment') || titleLower.includes('movie') || titleLower.includes('music')) {
+      return 'https://images.unsplash.com/photo-1598899134739-24c46f58b8c0?w=800&q=80';
+    } else if (titleLower.includes('science') || titleLower.includes('research')) {
+      return 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=800&q=80';
+    } else if (titleLower.includes('climate') || titleLower.includes('environment') || titleLower.includes('summit')) {
+      return 'https://images.unsplash.com/photo-1569163139394-de4798aa62b6?w=800&q=80';
+    } else if (titleLower.includes('politics') || titleLower.includes('election') || titleLower.includes('government')) {
+      return 'https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?w=800&q=80';
+    } else {
+      return 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&q=80';
+    }
+  };
+
+  const displayImage = imageUrl || getFallbackImage();
+
   useEffect(() => {
     const fetchContent = async () => {
       try {
@@ -51,8 +78,6 @@ function ReadPageContent() {
             </a>
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-gray-900 mb-3 sm:mb-4 leading-tight">{title}</h1>
             <div className="text-xs sm:text-sm text-gray-600 flex flex-wrap items-center font-medium gap-2">
-              {source && <span className="text-gray-900 font-bold">{source}</span>}
-              {(source && publishedAt) && <span className="text-gray-300">•</span>}
               {publishedAt && (
                 <span>
                   {new Date(publishedAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
@@ -61,11 +86,9 @@ function ReadPageContent() {
             </div>
           </header>
 
-          {imageUrl && (
-            <div className="w-full h-56 sm:h-72 lg:h-96 bg-gradient-to-br from-gray-100 to-gray-50 overflow-hidden">
-              <img src={imageUrl} alt={title} className="w-full h-full object-cover" />
-            </div>
-          )}
+          <div className="w-full h-56 sm:h-72 lg:h-96 bg-gradient-to-br from-gray-100 to-gray-50 overflow-hidden">
+            <img src={displayImage} alt={title} className="w-full h-full object-cover" />
+          </div>
 
           <div className="p-6 sm:p-8 lg:p-12">
             {loading ? (
@@ -82,25 +105,6 @@ function ReadPageContent() {
                     </p>
                   ) : null
                 ))}
-              </div>
-            )}
-
-            {url && (
-              <div className="mt-8 sm:mt-10 pt-6 sm:pt-8 border-t border-gray-200">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between bg-gray-50 rounded-xl p-4 sm:p-6 gap-4">
-                  <div>
-                    <p className="text-sm font-semibold text-gray-700 mb-1">Read the full story</p>
-                    <p className="text-xs text-gray-500">Continue reading on the original source</p>
-                  </div>
-                  <a 
-                    href={url} 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
-                    className="w-full sm:w-auto text-center px-6 py-3 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 hover:shadow-lg hover:shadow-red-600/30 transition-all duration-200 active:scale-95 text-sm touch-manipulation"
-                  >
-                    Visit Source →
-                  </a>
-                </div>
               </div>
             )}
           </div>

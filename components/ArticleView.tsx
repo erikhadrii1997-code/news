@@ -23,6 +23,34 @@ const ArticleView: React.FC<ArticleViewProps> = ({ article, onClose }) => {
   const contentRef = useRef<HTMLDivElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
 
+  // Get a fallback image based on category or title content
+  const getFallbackImage = () => {
+    const category = article.category?.toLowerCase() || '';
+    const titleLower = article.title.toLowerCase();
+    
+    if (category.includes('tech') || titleLower.includes('tech') || titleLower.includes('ai') || titleLower.includes('computer')) {
+      return 'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=800&q=80';
+    } else if (category.includes('business') || titleLower.includes('business') || titleLower.includes('market') || titleLower.includes('economy')) {
+      return 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&q=80';
+    } else if (category.includes('sport') || titleLower.includes('sport') || titleLower.includes('football') || titleLower.includes('soccer')) {
+      return 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800&q=80';
+    } else if (category.includes('health') || titleLower.includes('health') || titleLower.includes('medical')) {
+      return 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&q=80';
+    } else if (category.includes('entertainment') || titleLower.includes('entertainment') || titleLower.includes('movie') || titleLower.includes('music')) {
+      return 'https://images.unsplash.com/photo-1598899134739-24c46f58b8c0?w=800&q=80';
+    } else if (category.includes('science') || titleLower.includes('science') || titleLower.includes('research')) {
+      return 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=800&q=80';
+    } else if (titleLower.includes('climate') || titleLower.includes('environment') || titleLower.includes('summit')) {
+      return 'https://images.unsplash.com/photo-1569163139394-de4798aa62b6?w=800&q=80';
+    } else if (titleLower.includes('politics') || titleLower.includes('election') || titleLower.includes('government')) {
+      return 'https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?w=800&q=80';
+    } else {
+      return 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&q=80';
+    }
+  };
+
+  const displayImage = article.imageUrl || getFallbackImage();
+
   useEffect(() => {
     const fetchFullContent = async () => {
       try {
@@ -253,7 +281,7 @@ const ArticleView: React.FC<ArticleViewProps> = ({ article, onClose }) => {
           {/* Header */}
           <div className="relative h-56 w-full bg-gradient-to-br from-gray-900 to-gray-700 overflow-hidden">
             <Image
-              src={article.imageUrl}
+              src={displayImage}
               alt={cleanTitle}
               fill
               className="object-cover"
@@ -424,52 +452,42 @@ const ArticleView: React.FC<ArticleViewProps> = ({ article, onClose }) => {
                 </div>
               )}
               
-              {/* Article Content */}
+              {/* Article Content Preview */}
               {!isLoadingContent && (
                 <div className="prose prose-xl max-w-none">
                   <div 
                     className="text-gray-700 leading-relaxed space-y-5"
                     style={{ fontSize: `${fontSize}px`, lineHeight: fitToScreen ? '1.5' : '1.7' }}
                   >
-                    {fullContent.split('\n\n').map((paragraph, index) => (
+                    {fullContent.split('\n\n').slice(0, 3).map((paragraph, index) => (
                       paragraph.trim() && (
                         <p key={index} className="text-gray-700 leading-relaxed mb-6 text-body">
                           {paragraph.trim()}
                         </p>
                       )
                     ))}
+                    {fullContent.split('\n\n').length > 3 && (
+                      <div className="text-center py-4">
+                        <p className="text-gray-500 italic">... continue reading for the full article ...</p>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
 
-              {/* Source Link */}
+              {/* Continue Reading Button - Bottom */}
               <div className="mt-12 pt-8 border-t border-gray-200/50">
-                <div className="flex items-center justify-between">
-                  <div className="text-sm text-gray-500">
-                    <span className="font-medium">Source:</span>
-                    <a 
-                      href={article.url} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="ml-2 text-red-600 hover:text-red-700 font-medium hover:underline transition-colors duration-200"
-                    >
-                      Read original article
-                    </a>
-                  </div>
-                  
-                  {!fitToScreen && (
-                    <div className="flex items-center space-x-2 text-sm text-gray-500">
-                      <span>Reading progress:</span>
-                      <div className="w-16 h-2 bg-gray-200 rounded-full overflow-hidden">
-                        <div 
-                          className="h-full bg-gradient-to-r from-red-500 to-red-600 transition-all duration-300"
-                          style={{ width: `${readingProgress}%` }}
-                        ></div>
-                      </div>
-                      <span className="font-medium">{Math.round(readingProgress)}%</span>
-                    </div>
-                  )}
-                </div>
+                <a 
+                  href={article.url} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center w-full px-8 py-4 bg-red-600 text-white text-lg font-bold rounded-lg hover:bg-red-700 hover:shadow-xl hover:shadow-red-600/30 transition-all duration-200 active:scale-95"
+                >
+                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </svg>
+                  Continue Reading Full Article
+                </a>
               </div>
             </div>
           </div>

@@ -91,16 +91,32 @@ const NewsCard: React.FC<NewsCardProps> = ({ article, onClick }) => {
               {formatDate(article.publishedAt)}
             </time>
             <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
-            <span className="text-xs text-gray-500 font-medium uppercase tracking-wide">
-              {article.source}
+            <span className="text-xs text-red-600 font-black uppercase tracking-wide">
+              BREAKING NEWS
             </span>
           </div>
           <h3 className="text-base sm:text-lg font-black text-gray-900 mb-3 line-clamp-2 group-hover:text-blue-600 transition-colors duration-200 leading-tight">
             {title}
           </h3>
-          <p className="text-sm text-gray-700 leading-relaxed">
+          <p className="text-sm text-gray-700 leading-relaxed mb-4">
             {article.description}
           </p>
+          
+          {/* Read Button */}
+          <div className="flex justify-between items-center">
+            <button 
+              className="bg-black text-white px-4 py-2 text-xs font-black uppercase tracking-wider hover:bg-red-600 transition-all duration-300 group-hover:bg-red-600"
+              onClick={(e) => {
+                e.preventDefault();
+                window.location.href = `/read?u=${encodeURIComponent(article.url)}&t=${encodeURIComponent(title)}&d=${encodeURIComponent(article.description || '')}&i=${encodeURIComponent(article.imageUrl || '')}&p=${encodeURIComponent(article.publishedAt)}&s=${encodeURIComponent(article.source)}`;
+              }}
+            >
+              Read Article
+            </button>
+            <span className="text-xs text-gray-400 font-medium">
+              {Math.ceil(article.description?.length / 100) || 1} min read
+            </span>
+          </div>
         </div>
       </div>
     </a>

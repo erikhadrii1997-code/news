@@ -178,10 +178,21 @@ function HomePageContent() {
                       <p className="text-lg text-gray-700 mb-4 leading-relaxed">
                         {heroArticle.description}
                       </p>
-                      <div className="flex items-center text-sm text-gray-500 space-x-4">
-                        <time>{formatDate(heroArticle.publishedAt)}</time>
-                        <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
-                        <span className="uppercase tracking-wide">{heroArticle.source}</span>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center text-sm text-gray-500 space-x-4">
+                          <time>{formatDate(heroArticle.publishedAt)}</time>
+                          <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
+                          <span className="uppercase tracking-wide text-red-600 font-black">BREAKING NEWS</span>
+                        </div>
+                        <button 
+                          onClick={(e) => {
+                            e.preventDefault();
+                            window.location.href = `/read?u=${encodeURIComponent(heroArticle.url)}&t=${encodeURIComponent(heroArticle.title)}&d=${encodeURIComponent(heroArticle.description || '')}&i=${encodeURIComponent(heroArticle.imageUrl || '')}&p=${encodeURIComponent(heroArticle.publishedAt)}&s=${encodeURIComponent(heroArticle.source)}`;
+                          }}
+                          className="bg-red-600 text-white px-6 py-3 text-sm font-black uppercase tracking-wider hover:bg-black transition-all duration-300"
+                        >
+                          Read Story
+                        </button>
                       </div>
                     </a>
                   </div>
@@ -218,13 +229,24 @@ function HomePageContent() {
                     <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-3 group-hover:text-blue-600 transition-colors leading-tight">
                       {article.title}
                     </h3>
-                    <p className="text-sm text-gray-600 mb-2">
+                    <p className="text-sm text-gray-600 mb-3">
                       {article.description}
                     </p>
-                    <div className="flex items-center space-x-2 text-xs">
-                      <span className="text-gray-700 font-medium uppercase">{article.source}</span>
-                      <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
-                      <time className="text-gray-500">{formatDate(article.publishedAt)}</time>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2 text-xs">
+                        <span className="text-red-600 font-black uppercase">BREAKING NEWS</span>
+                        <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
+                        <time className="text-gray-500">{formatDate(article.publishedAt)}</time>
+                      </div>
+                      <button 
+                        onClick={(e) => {
+                          e.preventDefault();
+                          window.location.href = `/read?u=${encodeURIComponent(article.url)}&t=${encodeURIComponent(article.title)}&d=${encodeURIComponent(article.description || '')}&i=${encodeURIComponent(article.imageUrl || '')}&p=${encodeURIComponent(article.publishedAt)}&s=${encodeURIComponent(article.source)}`;
+                        }}
+                        className="bg-black text-white px-3 py-1 text-xs font-black uppercase tracking-wider hover:bg-red-600 transition-all duration-300"
+                      >
+                        Read
+                      </button>
                     </div>
                   </a>
                 ))}
@@ -258,16 +280,25 @@ function HomePageContent() {
                               {getCategoryBadge(article.category).text}
                             </span>
                             <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
-                            <span className="text-xs text-gray-600 font-medium uppercase">{article.source}</span>
+                            <span className="text-xs text-red-600 font-black uppercase">BREAKING NEWS</span>
                             <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
                             <time className="text-xs text-gray-500">{formatDate(article.publishedAt)}</time>
                           </div>
                           <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors leading-tight">
                             {article.title}
                           </h3>
-                          <p className="text-sm text-gray-600 leading-relaxed">
+                          <p className="text-sm text-gray-600 leading-relaxed mb-3">
                             {article.description}
                           </p>
+                          <button 
+                            onClick={(e) => {
+                              e.preventDefault();
+                              window.location.href = `/read?u=${encodeURIComponent(article.url)}&t=${encodeURIComponent(article.title)}&d=${encodeURIComponent(article.description || '')}&i=${encodeURIComponent(article.imageUrl || '')}&p=${encodeURIComponent(article.publishedAt)}&s=${encodeURIComponent(article.source)}`;
+                            }}
+                            className="bg-red-600 text-white px-4 py-2 text-xs font-black uppercase tracking-wider hover:bg-black transition-all duration-300"
+                          >
+                            Read Full Story
+                          </button>
                         </div>
                       </a>
                     </article>

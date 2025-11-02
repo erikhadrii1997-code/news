@@ -88,11 +88,6 @@ const SiteNavbar: React.FC<NavbarProps> = ({ onSearch, onCategoryChange, current
             </button>
           </form>
 
-          {/* Subscribe Button */}
-          <button className="hidden lg:block px-6 py-3 bg-red-600 text-white font-black uppercase tracking-wider hover:bg-black transition-all duration-300 text-sm">
-            Subscribe
-          </button>
-
           {/* Mobile Menu Toggle */}
           <button 
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} 

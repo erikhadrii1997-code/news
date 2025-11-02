@@ -25,21 +25,79 @@ function HomePageContent() {
     const t = (item.title || '').toLowerCase();
     const isDodgersBlueJays = t.includes('dodgers') && t.includes('blue jays');
     
-    // If searching, also filter by search query in title, description, and source
+    // If searching, use intelligent search with partial matching
     if (searchQuery && searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
+      const query = searchQuery.toLowerCase().trim();
       const title = (item.title || '').toLowerCase();
       const description = (item.description || '').toLowerCase();
       const source = (item.source || '').toLowerCase();
       
-      const matchesSearch = title.includes(query) || 
-                           description.includes(query) || 
-                           source.includes(query);
+      // Split search query into individual words for better matching
+      const searchWords = query.split(/\s+/).filter(word => word.length > 0);
+      
+      // Function to check if text contains all search words (partial matching)
+      const containsAllWords = (text: string, words: string[]) => {
+        return words.every(word => {
+          // Check exact word match or partial match within words
+          return text.includes(word) || 
+                 text.split(/\s+/).some(textWord => 
+                   textWord.includes(word) || word.includes(textWord)
+                 );
+        });
+      };
+      
+      // Function to calculate search relevance score
+      const getRelevanceScore = (text: string, words: string[]) => {
+        let score = 0;
+        words.forEach(word => {
+          if (text.includes(word)) score += word.length;
+          // Bonus for exact word matches
+          if (text.split(/\s+/).includes(word)) score += 5;
+        });
+        return score;
+      };
+      
+      // Check if any field contains all search words
+      const titleMatches = containsAllWords(title, searchWords);
+      const descriptionMatches = containsAllWords(description, searchWords);
+      const sourceMatches = containsAllWords(source, searchWords);
+      
+      // Also check for direct substring match (original behavior)
+      const directMatch = title.includes(query) || 
+                         description.includes(query) || 
+                         source.includes(query);
+      
+      const matchesSearch = titleMatches || descriptionMatches || sourceMatches || directMatch;
       
       return !isDodgersBlueJays && matchesSearch;
     }
     
     return !isDodgersBlueJays;
+  }).sort((a, b) => {
+    // Sort by relevance when searching
+    if (searchQuery && searchQuery.trim()) {
+      const query = searchQuery.toLowerCase().trim();
+      const searchWords = query.split(/\s+/).filter(word => word.length > 0);
+      
+      const getRelevanceScore = (item: any) => {
+        const title = (item.title || '').toLowerCase();
+        const description = (item.description || '').toLowerCase();
+        let score = 0;
+        
+        // Higher score for title matches
+        searchWords.forEach(word => {
+          if (title.includes(word)) score += word.length * 3;
+          if (description.includes(word)) score += word.length;
+          // Bonus for exact matches at word boundaries
+          if (title.split(/\s+/).includes(word)) score += 10;
+        });
+        
+        return score;
+      };
+      
+      return getRelevanceScore(b) - getRelevanceScore(a);
+    }
+    return 0;
   });
 
   const handleSearch = (query: string) => {

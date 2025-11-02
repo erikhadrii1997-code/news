@@ -25,7 +25,11 @@ const SiteNavbar: React.FC<NavbarProps> = ({ onSearch, onCategoryChange, current
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    onSearch(searchQuery);
+    if (searchQuery.trim()) {
+      onSearch(searchQuery.trim());
+      // Auto-close mobile menu after search
+      setIsMobileMenuOpen(false);
+    }
   };
 
   const clearSearch = () => {

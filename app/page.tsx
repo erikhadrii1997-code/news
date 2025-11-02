@@ -130,16 +130,16 @@ function HomePageContent() {
                       }}
                       className="text-left group cursor-pointer"
                     >
-                      <h2 className="text-4xl font-extrabold text-gray-900 mb-5 leading-tight group-hover:text-red-600 transition-colors duration-300">
+                      <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-gray-900 mb-4 sm:mb-5 leading-tight group-hover:text-red-600 transition-colors duration-300">
                         {topArticle.title}
                       </h2>
-                      <p className="text-lg text-gray-700 mb-6 line-clamp-4 leading-relaxed">
+                      <p className="text-base sm:text-lg text-gray-700 mb-4 sm:mb-6 line-clamp-3 sm:line-clamp-4 leading-relaxed">
                         {topArticle.description}
                       </p>
-                      <div className="flex items-center justify-between text-sm">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 text-sm">
                         <div className="flex items-center text-gray-600 font-medium">
                           <span className="text-gray-900 font-bold">{topArticle.source}</span>
-                          <span className="mx-3 text-gray-300">•</span>
+                          <span className="mx-2 sm:mx-3 text-gray-300">•</span>
                           <span>
                             {new Date(topArticle.publishedAt).toLocaleDateString('en-US', {
                               month: 'short',
@@ -154,7 +154,7 @@ function HomePageContent() {
                           onClick={(e) => {
                             e.stopPropagation();
                           }}
-                          className="ml-4 px-6 py-2.5 rounded-lg text-sm font-bold bg-red-600 text-white hover:bg-red-700 hover:shadow-lg hover:shadow-red-600/30 transition-all duration-200 active:scale-95"
+                          className="w-full sm:w-auto text-center px-6 py-2.5 rounded-lg text-sm font-bold bg-red-600 text-white hover:bg-red-700 hover:shadow-lg hover:shadow-red-600/30 transition-all duration-200 active:scale-95 touch-manipulation"
                           aria-label="Open top article"
                         >
                           Open
@@ -166,7 +166,7 @@ function HomePageContent() {
               )}
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 lg:gap-7">
               {otherArticles.map((article) => (
                 <NewsCard
                   key={article.id}

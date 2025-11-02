@@ -25,7 +25,7 @@ function HomePageContent() {
     const t = (item.title || '').toLowerCase();
     const isDodgersBlueJays = t.includes('dodgers') && t.includes('blue jays');
     
-    // If searching, use intelligent search with partial matching
+    // If searching, use ultra-intelligent search with flexible matching
     if (searchQuery && searchQuery.trim()) {
       const query = searchQuery.toLowerCase().trim();
       const title = (item.title || '').toLowerCase();
@@ -33,41 +33,81 @@ function HomePageContent() {
       const source = (item.source || '').toLowerCase();
       
       // Split search query into individual words for better matching
-      const searchWords = query.split(/\s+/).filter(word => word.length > 0);
+      const searchWords = query.split(/\s+/).filter(word => word.length > 2); // Filter out very short words
       
-      // Function to check if text contains all search words (partial matching)
-      const containsAllWords = (text: string, words: string[]) => {
-        return words.every(word => {
-          // Check exact word match or partial match within words
-          return text.includes(word) || 
-                 text.split(/\s+/).some(textWord => 
-                   textWord.includes(word) || word.includes(textWord)
-                 );
-        });
+      // Function for ultra-flexible matching
+      const ultraFlexibleMatch = (text: string, searchWord: string) => {
+        // Direct substring match
+        if (text.includes(searchWord)) return true;
+        
+        // Word boundary matching - find if searchWord appears as beginning of any word
+        const textWords = text.split(/\s+|[^\w]/);
+        for (const textWord of textWords) {
+          if (textWord.toLowerCase().startsWith(searchWord.toLowerCase())) return true;
+          if (searchWord.toLowerCase().startsWith(textWord.toLowerCase()) && textWord.length > 2) return true;
+        }
+        
+        // Fuzzy matching for similar words (simple character similarity)
+        for (const textWord of textWords) {
+          if (textWord.length >= 4 && searchWord.length >= 4) {
+            const similarity = calculateSimilarity(textWord.toLowerCase(), searchWord.toLowerCase());
+            if (similarity > 0.7) return true; // 70% similarity threshold
+          }
+        }
+        
+        return false;
       };
       
-      // Function to calculate search relevance score
-      const getRelevanceScore = (text: string, words: string[]) => {
-        let score = 0;
-        words.forEach(word => {
-          if (text.includes(word)) score += word.length;
-          // Bonus for exact word matches
-          if (text.split(/\s+/).includes(word)) score += 5;
-        });
-        return score;
+      // Simple similarity function
+      const calculateSimilarity = (str1: string, str2: string) => {
+        const longer = str1.length > str2.length ? str1 : str2;
+        const shorter = str1.length > str2.length ? str2 : str1;
+        const editDistance = getEditDistance(longer, shorter);
+        return (longer.length - editDistance) / longer.length;
       };
       
-      // Check if any field contains all search words
-      const titleMatches = containsAllWords(title, searchWords);
-      const descriptionMatches = containsAllWords(description, searchWords);
-      const sourceMatches = containsAllWords(source, searchWords);
+      // Simple edit distance calculation
+      const getEditDistance = (str1: string, str2: string) => {
+        const matrix = Array(str2.length + 1).fill(null).map(() => Array(str1.length + 1).fill(null));
+        for (let i = 0; i <= str1.length; i++) matrix[0][i] = i;
+        for (let j = 0; j <= str2.length; j++) matrix[j][0] = j;
+        for (let j = 1; j <= str2.length; j++) {
+          for (let i = 1; i <= str1.length; i++) {
+            const indicator = str1[i - 1] === str2[j - 1] ? 0 : 1;
+            matrix[j][i] = Math.min(
+              matrix[j][i - 1] + 1, // deletion
+              matrix[j - 1][i] + 1, // insertion
+              matrix[j - 1][i - 1] + indicator // substitution
+            );
+          }
+        }
+        return matrix[str2.length][str1.length];
+      };
       
-      // Also check for direct substring match (original behavior)
-      const directMatch = title.includes(query) || 
-                         description.includes(query) || 
-                         source.includes(query);
+      // Check for matches in different ways
+      let matchesSearch = false;
       
-      const matchesSearch = titleMatches || descriptionMatches || sourceMatches || directMatch;
+      // For single word searches, be very flexible
+      if (searchWords.length === 1) {
+        const searchWord = searchWords[0];
+        matchesSearch = ultraFlexibleMatch(title, searchWord) || 
+                       ultraFlexibleMatch(description, searchWord) || 
+                       ultraFlexibleMatch(source, searchWord);
+      } else {
+        // For multi-word searches, at least one word should match flexibly
+        matchesSearch = searchWords.some(word => 
+          ultraFlexibleMatch(title, word) || 
+          ultraFlexibleMatch(description, word) || 
+          ultraFlexibleMatch(source, word)
+        );
+      }
+      
+      // Also keep the original direct matching as fallback
+      if (!matchesSearch) {
+        matchesSearch = title.includes(query) || 
+                       description.includes(query) || 
+                       source.includes(query);
+      }
       
       return !isDodgersBlueJays && matchesSearch;
     }
@@ -86,10 +126,14 @@ function HomePageContent() {
         
         // Higher score for title matches
         searchWords.forEach(word => {
-          if (title.includes(word)) score += word.length * 3;
+          // Exact word matches get highest score
+          if (title.split(/\s+/).some((titleWord: string) => titleWord === word)) score += 20;
+          // Word starting matches get high score  
+          else if (title.split(/\s+/).some((titleWord: string) => titleWord.startsWith(word))) score += 15;
+          // Substring matches get medium score
+          else if (title.includes(word)) score += word.length * 3;
+          // Description matches get lower score
           if (description.includes(word)) score += word.length;
-          // Bonus for exact matches at word boundaries
-          if (title.split(/\s+/).includes(word)) score += 10;
         });
         
         return score;

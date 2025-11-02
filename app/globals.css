@@ -5,6 +5,11 @@
   box-sizing: border-box;
 }
 
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
 body {
   background: linear-gradient(135deg, #fafafa 0%, #ffffff 100%);
   color: #111827; /* gray-900 */
@@ -12,20 +17,40 @@ body {
   -moz-osx-font-smoothing: grayscale;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
 }
 
+/* Mobile-first responsive typography */
 .headline-primary {
-  font-size: 2.5rem;
+  font-size: 1.75rem;
   font-weight: 800;
   line-height: 1.1;
   letter-spacing: -0.03em;
 }
 
+@media (min-width: 640px) {
+  .headline-primary {
+    font-size: 2rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .headline-primary {
+    font-size: 2.5rem;
+  }
+}
+
 .headline-secondary {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   font-weight: 700;
   line-height: 1.2;
   letter-spacing: -0.02em;
+}
+
+@media (min-width: 768px) {
+  .headline-secondary {
+    font-size: 1.5rem;
+  }
 }
 
 .line-clamp-1 {
@@ -199,3 +224,39 @@ button, a[role="button"] {
   color: #991b1b;
 }
 
+/* Mobile-specific utilities */
+@media (max-width: 640px) {
+  /* Ensure images don't overflow on mobile */
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+  
+  /* Better tap targets for mobile */
+  button, a {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Prevent text overflow */
+  h1, h2, h3, h4, h5, h6 {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+}
+
+/* Hide scrollbar but keep functionality */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Touch-friendly elements */
+.touch-manipulation {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}

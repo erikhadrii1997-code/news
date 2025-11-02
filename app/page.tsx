@@ -89,10 +89,10 @@ function HomePageContent() {
     <div className="min-h-screen bg-gray-50">
       {/* Top Header Bar - AP Style */}
       <div className="bg-black text-white">
-        <div className="max-w-[1400px] mx-auto px-3 sm:px-4 lg:px-8 py-2">
-          <div className="flex flex-col sm:flex-row items-center sm:space-x-6 space-y-1 sm:space-y-0 text-xs">
-            <span className="font-bold tracking-wider text-center sm:text-left">ADVANCING THE POWER OF FACTS</span>
-            <time className="text-gray-400 text-center sm:text-left">{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}</time>
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-2">
+          <div className="flex items-center space-x-6 text-xs">
+            <span className="font-bold tracking-wider">ADVANCING THE POWER OF FACTS</span>
+            <time className="text-gray-400">{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}</time>
           </div>
         </div>
       </div>
@@ -104,11 +104,11 @@ function HomePageContent() {
         onSearch={handleSearch}
       />
 
-      <main className="max-w-[1400px] mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-6 lg:py-8 bg-white shadow-lg">
+      <main className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-white shadow-lg">
         {loading && (
-          <div className="flex flex-col items-center justify-center py-12 sm:py-20">
+          <div className="flex flex-col items-center justify-center py-20">
             <LoadingSpinner />
-            <p className="mt-4 text-gray-600 font-medium text-sm sm:text-base">Loading latest news...</p>
+            <p className="mt-4 text-gray-600 font-medium">Loading latest news...</p>
           </div>
         )}
         
@@ -130,14 +130,14 @@ function HomePageContent() {
           <>
             {/* Search Results Section */}
             {searchQuery && (
-              <section className="mb-8 sm:mb-12">
-                <div className="border-b-4 border-black pb-3 sm:pb-4 mb-6 sm:mb-8">
-                  <h2 className="text-2xl sm:text-3xl font-black uppercase tracking-wider">
+              <section className="mb-12">
+                <div className="border-b-4 border-black pb-4 mb-8">
+                  <h2 className="text-3xl font-black uppercase tracking-wider">
                     Search Results for "{searchQuery}"
                   </h2>
-                  <p className="text-gray-600 mt-2 text-sm sm:text-base">Found {filteredNews.length} articles</p>
+                  <p className="text-gray-600 mt-2">Found {filteredNews.length} articles</p>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {filteredNews.map((article) => (
                     <NewsCard
                       key={article.id}
@@ -151,8 +151,8 @@ function HomePageContent() {
 
             {/* Hero Section - AP Style - Only show when NOT searching */}
             {!searchQuery && heroArticle && (
-              <section className="mb-8 sm:mb-12 border-b-4 border-black pb-6 sm:pb-8">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
+              <section className="mb-12 border-b-4 border-black pb-8">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                   {/* Hero Image */}
                   <a href={`/read?u=${encodeURIComponent(heroArticle.url)}&t=${encodeURIComponent(heroArticle.title)}&d=${encodeURIComponent(heroArticle.description || '')}&i=${encodeURIComponent(heroArticle.imageUrl || '')}&p=${encodeURIComponent(heroArticle.publishedAt)}&s=${encodeURIComponent(heroArticle.source)}`} className="group block">
                     <div className="relative aspect-[16/10] overflow-hidden bg-gray-100">
@@ -161,8 +161,8 @@ function HomePageContent() {
                         alt={heroArticle.title}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
-                      <div className="absolute top-3 sm:top-4 left-3 sm:left-4">
-                        <span className={`${getCategoryBadge(heroArticle.category).bg} text-white px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-bold tracking-wider`}>
+                      <div className="absolute top-4 left-4">
+                        <span className={`${getCategoryBadge(heroArticle.category).bg} text-white px-3 py-1 text-xs font-bold tracking-wider`}>
                           {getCategoryBadge(heroArticle.category).text}
                         </span>
                       </div>
@@ -172,13 +172,13 @@ function HomePageContent() {
                   {/* Hero Content */}
                   <div className="flex flex-col justify-center">
                     <a href={`/read?u=${encodeURIComponent(heroArticle.url)}&t=${encodeURIComponent(heroArticle.title)}&d=${encodeURIComponent(heroArticle.description || '')}&i=${encodeURIComponent(heroArticle.imageUrl || '')}&p=${encodeURIComponent(heroArticle.publishedAt)}&s=${encodeURIComponent(heroArticle.source)}`} className="group">
-                      <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-3 sm:mb-4 leading-tight group-hover:text-blue-600 transition-colors">
+                      <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 leading-tight group-hover:text-blue-600 transition-colors">
                         {heroArticle.title}
                       </h1>
-                      <p className="text-base sm:text-lg text-gray-700 mb-3 sm:mb-4 leading-relaxed">
+                      <p className="text-lg text-gray-700 mb-4 leading-relaxed">
                         {heroArticle.description}
                       </p>
-                      <div className="flex items-center text-xs sm:text-sm text-gray-500 space-x-3 sm:space-x-4">
+                      <div className="flex items-center text-sm text-gray-500 space-x-4">
                         <time>{formatDate(heroArticle.publishedAt)}</time>
                         <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
                         <span className="uppercase tracking-wide">{heroArticle.source}</span>
@@ -191,12 +191,12 @@ function HomePageContent() {
 
             {/* Top Stories Grid - AP Style - Only show when NOT searching */}
             {!searchQuery && (
-            <section className="mb-8 sm:mb-12">
-              <div className="flex items-center justify-between mb-4 sm:mb-6 border-b-2 border-black pb-2">
-                <h2 className="text-xl sm:text-2xl font-black text-black uppercase tracking-wide">Top Stories</h2>
-                <div className="w-12 sm:w-16 h-0.5 bg-red-600"></div>
+            <section className="mb-12">
+              <div className="flex items-center justify-between mb-6 border-b-2 border-black pb-2">
+                <h2 className="text-2xl font-black text-black uppercase tracking-wide">Top Stories</h2>
+                <div className="w-16 h-0.5 bg-red-600"></div>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {topStories.map((article) => (
                   <a
                     key={article.id}
@@ -215,7 +215,7 @@ function HomePageContent() {
                         </span>
                       </div>
                     </div>
-                    <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-2 line-clamp-3 group-hover:text-blue-600 transition-colors leading-tight">
+                    <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-3 group-hover:text-blue-600 transition-colors leading-tight">
                       {article.title}
                     </h3>
                     <p className="text-sm text-gray-600 mb-2">
@@ -234,18 +234,18 @@ function HomePageContent() {
 
             {/* Main Content Area - Only show when NOT searching */}
             {!searchQuery && (
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 mb-8 sm:mb-12">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
               {/* Latest Stories - Left/Center Column */}
               <div className="lg:col-span-2">
-                <div className="flex items-center justify-between mb-4 sm:mb-6 border-b-2 border-black pb-2">
-                  <h2 className="text-xl sm:text-2xl font-black text-black uppercase tracking-wide">Latest Stories</h2>
-                  <div className="w-12 sm:w-16 h-0.5 bg-red-600"></div>
+                <div className="flex items-center justify-between mb-6 border-b-2 border-black pb-2">
+                  <h2 className="text-2xl font-black text-black uppercase tracking-wide">Latest Stories</h2>
+                  <div className="w-16 h-0.5 bg-red-600"></div>
                 </div>
-                <div className="space-y-4 sm:space-y-6">
+                <div className="space-y-6">
                   {latestStories.map((article) => (
-                    <article key={article.id} className="group border-b border-gray-200 pb-4 sm:pb-6 last:border-0">
-                      <a href={`/read?u=${encodeURIComponent(article.url)}&t=${encodeURIComponent(article.title)}&d=${encodeURIComponent(article.description || '')}&i=${encodeURIComponent(article.imageUrl || '')}&p=${encodeURIComponent(article.publishedAt)}&s=${encodeURIComponent(article.source)}`} className="flex flex-col sm:flex-row gap-3 sm:gap-5">
-                        <div className="flex-shrink-0 w-full sm:w-48 h-48 sm:h-32 bg-gray-100 overflow-hidden">
+                    <article key={article.id} className="group border-b border-gray-200 pb-6 last:border-0">
+                      <a href={`/read?u=${encodeURIComponent(article.url)}&t=${encodeURIComponent(article.title)}&d=${encodeURIComponent(article.description || '')}&i=${encodeURIComponent(article.imageUrl || '')}&p=${encodeURIComponent(article.publishedAt)}&s=${encodeURIComponent(article.source)}`} className="flex gap-5">
+                        <div className="flex-shrink-0 w-48 h-32 bg-gray-100 overflow-hidden">
                           <img
                             src={article.imageUrl}
                             alt={article.title}
@@ -253,16 +253,16 @@ function HomePageContent() {
                           />
                         </div>
                         <div className="flex-1">
-                          <div className="flex flex-wrap items-center gap-2 mb-2">
+                          <div className="flex items-center space-x-2 mb-2">
                             <span className={`${getCategoryBadge(article.category).bg} text-white px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase`}>
                               {getCategoryBadge(article.category).text}
                             </span>
-                            <span className="w-1 h-1 bg-gray-400 rounded-full hidden sm:block"></span>
+                            <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
                             <span className="text-xs text-gray-600 font-medium uppercase">{article.source}</span>
-                            <span className="w-1 h-1 bg-gray-400 rounded-full hidden sm:block"></span>
+                            <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
                             <time className="text-xs text-gray-500">{formatDate(article.publishedAt)}</time>
                           </div>
-                          <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors leading-tight">
+                          <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors leading-tight">
                             {article.title}
                           </h3>
                           <p className="text-sm text-gray-600 leading-relaxed">
@@ -276,20 +276,20 @@ function HomePageContent() {
               </div>
 
               {/* Sidebar - Right Column */}
-              <aside className="lg:col-span-1 space-y-6 sm:space-y-8">
+              <aside className="lg:col-span-1 space-y-8">
                 {/* Trending Now */}
-                <div className="bg-gray-50 p-4 sm:p-6 rounded-lg">
+                <div className="bg-gray-50 p-6 rounded-lg">
                   <div className="flex items-center justify-between mb-4 border-b-2 border-black pb-2">
-                    <h2 className="text-base sm:text-lg font-black text-black uppercase tracking-wide">Trending Now</h2>
+                    <h2 className="text-lg font-black text-black uppercase tracking-wide">Trending Now</h2>
                   </div>
-                  <div className="space-y-3 sm:space-y-4">
+                  <div className="space-y-4">
                     {trending.map((article, index) => (
                       <a
                         key={article.id}
                         href={`/read?u=${encodeURIComponent(article.url)}&t=${encodeURIComponent(article.title)}&d=${encodeURIComponent(article.description || '')}&i=${encodeURIComponent(article.imageUrl || '')}&p=${encodeURIComponent(article.publishedAt)}&s=${encodeURIComponent(article.source)}`}
                         className="group flex gap-3"
                       >
-                        <span className="flex-shrink-0 text-2xl sm:text-3xl font-black text-gray-200 group-hover:text-red-600 transition-colors">
+                        <span className="flex-shrink-0 text-3xl font-black text-gray-200 group-hover:text-red-600 transition-colors">
                           {index + 1}
                         </span>
                         <div className="flex-1">
@@ -304,11 +304,11 @@ function HomePageContent() {
                 </div>
 
                 {/* Editor's Picks */}
-                <div className="bg-black text-white p-4 sm:p-6 rounded-lg">
+                <div className="bg-black text-white p-6 rounded-lg">
                   <div className="flex items-center justify-between mb-4 border-b-2 border-white pb-2">
-                    <h2 className="text-base sm:text-lg font-black uppercase tracking-wide">Editor's Picks</h2>
+                    <h2 className="text-lg font-black uppercase tracking-wide">Editor's Picks</h2>
                   </div>
-                  <div className="space-y-4 sm:space-y-5">
+                  <div className="space-y-5">
                     {editorsPicks.map((article) => (
                       <a
                         key={article.id}
@@ -332,8 +332,8 @@ function HomePageContent() {
                 </div>
 
                 {/* Categories Quick Links */}
-                <div className="border-2 border-gray-200 p-4 sm:p-6">
-                  <h3 className="text-base sm:text-lg font-black text-black uppercase tracking-wide mb-4 border-b-2 border-black pb-2">
+                <div className="border-2 border-gray-200 p-6">
+                  <h3 className="text-lg font-black text-black uppercase tracking-wide mb-4 border-b-2 border-black pb-2">
                     More Topics
                   </h3>
                   <div className="grid grid-cols-2 gap-2">
@@ -341,7 +341,7 @@ function HomePageContent() {
                       <button
                         key={cat}
                         onClick={() => handleCategoryChange(cat.toLowerCase())}
-                        className="text-left px-2 sm:px-3 py-2 text-xs sm:text-sm font-bold text-gray-700 hover:bg-gray-100 hover:text-blue-600 transition-colors border border-gray-300 rounded touch-manipulation"
+                        className="text-left px-3 py-2 text-sm font-bold text-gray-700 hover:bg-gray-100 hover:text-blue-600 transition-colors border border-gray-300 rounded"
                       >
                         {cat}
                       </button>
@@ -354,12 +354,12 @@ function HomePageContent() {
 
             {/* More News - Full Width Grid - Only show when NOT searching */}
             {!searchQuery && moreNews.length > 0 && (
-              <section className="border-t-2 border-black pt-6 sm:pt-8">
-                <div className="flex items-center justify-between mb-4 sm:mb-6 border-b-2 border-black pb-2">
-                  <h2 className="text-xl sm:text-2xl font-black text-black uppercase tracking-wide">More News</h2>
-                  <div className="w-12 sm:w-16 h-0.5 bg-red-600"></div>
+              <section className="border-t-2 border-black pt-8">
+                <div className="flex items-center justify-between mb-6 border-b-2 border-black pb-2">
+                  <h2 className="text-2xl font-black text-black uppercase tracking-wide">More News</h2>
+                  <div className="w-16 h-0.5 bg-red-600"></div>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                   {moreNews.slice(0, 12).map((article) => (
                     <NewsCard
                       key={article.id}
@@ -388,44 +388,44 @@ function HomePageContent() {
       )}
 
       {/* Footer - AP Style */}
-      <footer className="bg-black text-white mt-12 sm:mt-16">
-        <div className="max-w-[1400px] mx-auto px-3 sm:px-4 lg:px-8 py-8 sm:py-12">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 mb-6 sm:mb-8">
+      <footer className="bg-black text-white mt-16">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
             <div>
-              <h3 className="text-xs sm:text-sm font-black uppercase tracking-wider mb-3 sm:mb-4">About</h3>
-              <ul className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm">
+              <h3 className="text-sm font-black uppercase tracking-wider mb-4">About</h3>
+              <ul className="space-y-2 text-sm">
                 <li><a href="#" className="hover:text-red-400 transition-colors">Our Story</a></li>
                 <li><a href="#" className="hover:text-red-400 transition-colors">Careers</a></li>
                 <li><a href="#" className="hover:text-red-400 transition-colors">Awards</a></li>
               </ul>
             </div>
             <div>
-              <h3 className="text-xs sm:text-sm font-black uppercase tracking-wider mb-3 sm:mb-4">Content</h3>
-              <ul className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm">
+              <h3 className="text-sm font-black uppercase tracking-wider mb-4">Content</h3>
+              <ul className="space-y-2 text-sm">
                 <li><a href="#" className="hover:text-red-400 transition-colors">Latest News</a></li>
                 <li><a href="#" className="hover:text-red-400 transition-colors">Archive</a></li>
                 <li><a href="#" className="hover:text-red-400 transition-colors">Multimedia</a></li>
               </ul>
             </div>
             <div>
-              <h3 className="text-xs sm:text-sm font-black uppercase tracking-wider mb-3 sm:mb-4">Support</h3>
-              <ul className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm">
+              <h3 className="text-sm font-black uppercase tracking-wider mb-4">Support</h3>
+              <ul className="space-y-2 text-sm">
                 <li><a href="#" className="hover:text-red-400 transition-colors">Contact Us</a></li>
                 <li><a href="#" className="hover:text-red-400 transition-colors">Help Center</a></li>
                 <li><a href="#" className="hover:text-red-400 transition-colors">Feedback</a></li>
               </ul>
             </div>
             <div>
-              <h3 className="text-xs sm:text-sm font-black uppercase tracking-wider mb-3 sm:mb-4">Legal</h3>
-              <ul className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm">
+              <h3 className="text-sm font-black uppercase tracking-wider mb-4">Legal</h3>
+              <ul className="space-y-2 text-sm">
                 <li><a href="#" className="hover:text-red-400 transition-colors">Privacy Policy</a></li>
                 <li><a href="#" className="hover:text-red-400 transition-colors">Terms of Service</a></li>
                 <li><a href="#" className="hover:text-red-400 transition-colors">Cookie Policy</a></li>
               </ul>
             </div>
           </div>
-          <div className="border-t border-gray-700 pt-6 sm:pt-8">
-            <p className="text-xs sm:text-sm text-gray-400 text-center">
+          <div className="border-t border-gray-700 pt-8">
+            <p className="text-sm text-gray-400 text-center">
               © {new Date().getFullYear()} News Agency. All rights reserved. | Advancing the power of facts.
             </p>
           </div>

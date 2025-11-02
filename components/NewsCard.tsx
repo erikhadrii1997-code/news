@@ -61,10 +61,10 @@ const NewsCard: React.FC<NewsCardProps> = ({ article, onClick }) => {
   return (
     <a
       href={`/read?u=${encodeURIComponent(article.url)}&t=${encodeURIComponent(title)}&d=${encodeURIComponent(article.description || '')}&i=${encodeURIComponent(article.imageUrl || '')}&p=${encodeURIComponent(article.publishedAt)}&s=${encodeURIComponent(article.source)}`}
-      className="group bg-white border-2 border-gray-200 overflow-hidden hover:border-black transition-all duration-300 hover:shadow-2xl touch-manipulation block w-full"
+      className="group bg-white border-2 border-gray-200 overflow-hidden hover:border-black transition-all duration-300 hover:shadow-2xl touch-manipulation block"
     >
       <div className="w-full">
-        <div className="relative w-full h-44 sm:h-48 md:h-52 bg-gray-200 overflow-hidden">
+        <div className="relative w-full h-48 sm:h-52 md:h-48 bg-gray-200 overflow-hidden">
           <img 
             src={article.imageUrl || getFallbackImage()} 
             alt={title} 
@@ -79,26 +79,26 @@ const NewsCard: React.FC<NewsCardProps> = ({ article, onClick }) => {
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           {/* Category Badge */}
-          <div className="absolute top-2 sm:top-3 left-2 sm:left-3">
-            <span className={`${getCategoryColor(article.category)} text-white px-2 sm:px-3 py-0.5 sm:py-1 text-[9px] sm:text-[10px] font-black tracking-widest uppercase`}>
+          <div className="absolute top-3 left-3">
+            <span className={`${getCategoryColor(article.category)} text-white px-3 py-1 text-[10px] font-black tracking-widest uppercase`}>
               {article.category || 'NEWS'}
             </span>
           </div>
         </div>
-        <div className="p-3 sm:p-4 lg:p-5">
-          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-2">
-            <time className="text-[10px] sm:text-xs text-gray-500 font-medium uppercase tracking-wide">
+        <div className="p-5">
+          <div className="flex items-center space-x-2 mb-2">
+            <time className="text-xs text-gray-500 font-medium uppercase tracking-wide">
               {formatDate(article.publishedAt)}
             </time>
-            <span className="w-0.5 h-0.5 sm:w-1 sm:h-1 bg-gray-400 rounded-full"></span>
-            <span className="text-[10px] sm:text-xs text-gray-500 font-medium uppercase tracking-wide truncate max-w-[120px] sm:max-w-none">
+            <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
+            <span className="text-xs text-gray-500 font-medium uppercase tracking-wide">
               {article.source}
             </span>
           </div>
-          <h3 className="text-sm sm:text-base lg:text-lg font-black text-gray-900 mb-2 sm:mb-3 line-clamp-2 group-hover:text-blue-600 transition-colors duration-200 leading-tight break-words">
+          <h3 className="text-base sm:text-lg font-black text-gray-900 mb-3 line-clamp-2 group-hover:text-blue-600 transition-colors duration-200 leading-tight">
             {title}
           </h3>
-          <p className="text-xs sm:text-sm text-gray-700 leading-relaxed break-words">
+          <p className="text-sm text-gray-700 leading-relaxed">
             {article.description}
           </p>
         </div>

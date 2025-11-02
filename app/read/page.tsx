@@ -67,19 +67,17 @@ function ReadPageContent() {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-gray-50 to-white">
-      <div className="max-w-4xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-8 lg:py-12">
-        <article className="bg-white rounded-xl sm:rounded-2xl shadow-xl overflow-hidden">
-          <header className="p-4 sm:p-6 lg:p-8 pb-3 sm:pb-4 lg:pb-6 border-b border-gray-100">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+        <article className="bg-white rounded-2xl shadow-xl overflow-hidden">
+          <header className="p-6 sm:p-8 pb-4 sm:pb-6 border-b border-gray-100">
             <a 
               href="/" 
-              className="inline-flex items-center text-xs sm:text-sm font-semibold text-red-600 hover:text-red-700 mb-3 sm:mb-4 lg:mb-6 transition-colors touch-manipulation min-h-[44px]"
+              className="inline-flex items-center text-xs sm:text-sm font-semibold text-red-600 hover:text-red-700 mb-4 sm:mb-6 transition-colors touch-manipulation"
             >
               ← Back to News
             </a>
-            <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-extrabold text-gray-900 mb-2 sm:mb-3 lg:mb-4 leading-tight break-words">{title}</h1>
-            <div className="text-[10px] sm:text-xs md:text-sm text-gray-600 flex flex-wrap items-center font-medium gap-1.5 sm:gap-2">
-              {source && <span className="uppercase tracking-wider">{source}</span>}
-              {source && publishedAt && <span className="w-1 h-1 bg-gray-400 rounded-full"></span>}
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-gray-900 mb-3 sm:mb-4 leading-tight">{title}</h1>
+            <div className="text-xs sm:text-sm text-gray-600 flex flex-wrap items-center font-medium gap-2">
               {publishedAt && (
                 <span>
                   {new Date(publishedAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
@@ -88,13 +86,13 @@ function ReadPageContent() {
             </div>
           </header>
 
-          <div className="w-full h-48 sm:h-56 md:h-72 lg:h-96 bg-gradient-to-br from-gray-100 to-gray-50 overflow-hidden">
+          <div className="w-full h-56 sm:h-72 lg:h-96 bg-gradient-to-br from-gray-100 to-gray-50 overflow-hidden">
             <img src={displayImage} alt={title} className="w-full h-full object-cover" />
           </div>
 
-          <div className="p-4 sm:p-6 md:p-8 lg:p-12">
+          <div className="p-6 sm:p-8 lg:p-12">
             {loading ? (
-              <div className="flex items-center justify-center py-8 sm:py-12 text-gray-600 text-sm sm:text-base">
+              <div className="flex items-center justify-center py-12 text-gray-600">
                 <div className="w-5 h-5 sm:w-6 sm:h-6 border-3 border-gray-200 border-t-red-600 rounded-full animate-spin mr-3 sm:mr-4" />
                 <span className="text-base sm:text-lg font-medium">Loading article content…</span>
               </div>
@@ -102,7 +100,7 @@ function ReadPageContent() {
               <div className="prose prose-sm sm:prose-base lg:prose-lg max-w-none text-gray-800 leading-relaxed">
                 {content.split('\n\n').map((p, i) => (
                   p.trim() ? (
-                    <p key={i} className="mb-3 sm:mb-4 lg:mb-5 text-justify break-words">
+                    <p key={i} className="mb-4 sm:mb-5 text-justify">
                       {p.trim()}
                     </p>
                   ) : null
@@ -119,10 +117,10 @@ function ReadPageContent() {
 export default function ReadPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white flex items-center justify-center px-3">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white flex items-center justify-center">
         <div className="flex items-center text-gray-600">
-          <div className="w-5 h-5 sm:w-6 sm:h-6 border-3 border-gray-200 border-t-red-600 rounded-full animate-spin mr-3 sm:mr-4" />
-          <span className="text-base sm:text-lg font-medium">Loading article…</span>
+          <div className="w-6 h-6 border-3 border-gray-200 border-t-red-600 rounded-full animate-spin mr-4" />
+          <span className="text-lg font-medium">Loading article…</span>
         </div>
       </div>
     }>

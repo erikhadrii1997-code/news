@@ -37,21 +37,21 @@ const SiteNavbar: React.FC<NavbarProps> = ({ onSearch, onCategoryChange, current
     <header className="sticky top-0 z-50 bg-white border-b-4 border-black shadow-xl">
       {/* Breaking News Banner */}
       <div className="bg-black text-white py-2 text-center overflow-hidden">
-        <div className="flex items-center justify-center space-x-2 sm:space-x-4 animate-pulse px-3">
+        <div className="flex items-center justify-center space-x-4 animate-pulse">
           <span className="w-2 h-2 bg-red-600 rounded-full animate-ping"></span>
-          <span className="text-[10px] sm:text-xs font-black tracking-widest uppercase">Breaking News • Live Updates • Latest Stories</span>
+          <span className="text-xs font-black tracking-widest uppercase">Breaking News • Live Updates • Latest Stories</span>
           <span className="w-2 h-2 bg-red-600 rounded-full animate-ping"></span>
         </div>
       </div>
 
-      <div className="max-w-[1400px] mx-auto px-3 sm:px-4 lg:px-8">
-        <div className="flex items-center justify-between h-16 sm:h-20">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-20">
           {/* Logo */}
-          <div className="flex items-center space-x-1.5 sm:space-x-2">
-            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-black flex items-center justify-center">
-              <span className="text-white font-black text-lg sm:text-xl">N</span>
+          <div className="flex items-center space-x-2">
+            <div className="w-10 h-10 bg-black flex items-center justify-center">
+              <span className="text-white font-black text-xl">N</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-black tracking-tighter">
+            <h1 className="text-3xl sm:text-4xl font-black text-black tracking-tighter">
               NEWS<span className="text-red-600">.</span>
             </h1>
           </div>
@@ -96,12 +96,12 @@ const SiteNavbar: React.FC<NavbarProps> = ({ onSearch, onCategoryChange, current
           {/* Mobile Menu Toggle */}
           <button 
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} 
-            className="md:hidden p-2 hover:bg-gray-100 transition-colors rounded touch-manipulation" 
+            className="md:hidden p-3 hover:bg-gray-100 transition-colors" 
             aria-label="Toggle menu"
           >
-            <div className="w-5 h-0.5 bg-gray-900 mb-1 transition-all" />
-            <div className="w-5 h-0.5 bg-gray-900 mb-1 transition-all" />
-            <div className="w-5 h-0.5 bg-gray-900 transition-all" />
+            <div className="w-6 h-0.5 bg-gray-900 mb-1.5 transition-all" />
+            <div className="w-6 h-0.5 bg-gray-900 mb-1.5 transition-all" />
+            <div className="w-6 h-0.5 bg-gray-900 transition-all" />
           </button>
         </div>
 
@@ -114,13 +114,13 @@ const SiteNavbar: React.FC<NavbarProps> = ({ onSearch, onCategoryChange, current
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search news..."
-                className="w-full px-4 py-2.5 border-2 border-gray-200 focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-600/20 transition-all text-sm"
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-600/20 transition-all text-sm"
               />
               {searchQuery && (
                 <button
                   type="button"
                   onClick={clearSearch}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 font-bold text-lg touch-manipulation"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 font-bold text-lg"
                   aria-label="Clear search"
                 >
                   ×
@@ -129,7 +129,7 @@ const SiteNavbar: React.FC<NavbarProps> = ({ onSearch, onCategoryChange, current
             </div>
             <button 
               type="submit" 
-              className="w-full mt-2 px-4 py-2.5 bg-red-600 text-white font-bold hover:bg-red-700 active:scale-95 transition-all text-sm touch-manipulation"
+              className="w-full mt-3 px-4 py-3 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 active:scale-95 transition-all text-sm touch-manipulation"
             >
               Search
             </button>
@@ -137,7 +137,7 @@ const SiteNavbar: React.FC<NavbarProps> = ({ onSearch, onCategoryChange, current
         )}
 
         <nav className={`border-t-2 border-black bg-gray-50 ${isMobileMenuOpen ? 'block' : 'hidden md:block'}`}>
-          <div className="flex flex-col md:flex-row md:justify-center md:space-x-1 py-1 sm:py-2 overflow-x-auto scrollbar-hide">
+          <div className="flex flex-col md:flex-row md:justify-center md:space-x-1 py-2 overflow-x-auto scrollbar-hide">
             {categories.map((cat) => (
               <button
                 key={cat.id}
@@ -146,7 +146,7 @@ const SiteNavbar: React.FC<NavbarProps> = ({ onSearch, onCategoryChange, current
                   setIsMobileMenuOpen(false);
                 }}
                 className={`
-                  px-4 sm:px-6 py-2.5 sm:py-3 text-[10px] sm:text-xs font-black uppercase tracking-widest transition-all duration-200 whitespace-nowrap border-b-4 md:border-b-0 md:border-t-4 touch-manipulation
+                  px-6 py-3 text-xs font-black uppercase tracking-widest transition-all duration-200 whitespace-nowrap border-b-4 md:border-b-0 md:border-t-4
                   ${currentCategory === cat.id 
                     ? 'bg-black text-white border-red-600' 
                     : 'text-gray-800 hover:bg-white hover:text-black border-transparent hover:border-gray-300'

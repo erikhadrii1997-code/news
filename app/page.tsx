@@ -24,6 +24,21 @@ function HomePageContent() {
   const filteredNews = news.filter((item) => {
     const t = (item.title || '').toLowerCase();
     const isDodgersBlueJays = t.includes('dodgers') && t.includes('blue jays');
+    
+    // If searching, also filter by search query in title, description, and source
+    if (searchQuery && searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      const title = (item.title || '').toLowerCase();
+      const description = (item.description || '').toLowerCase();
+      const source = (item.source || '').toLowerCase();
+      
+      const matchesSearch = title.includes(query) || 
+                           description.includes(query) || 
+                           source.includes(query);
+      
+      return !isDodgersBlueJays && matchesSearch;
+    }
+    
     return !isDodgersBlueJays;
   });
 
@@ -135,17 +150,54 @@ function HomePageContent() {
                   <h2 className="text-3xl font-black uppercase tracking-wider">
                     Search Results for "{searchQuery}"
                   </h2>
-                  <p className="text-gray-600 mt-2">Found {filteredNews.length} articles</p>
+                  {loading ? (
+                    <div className="flex items-center mt-2">
+                      <LoadingSpinner />
+                      <p className="text-gray-600 ml-2">Searching for articles...</p>
+                    </div>
+                  ) : (
+                    <p className="text-gray-600 mt-2">
+                      {filteredNews.length === 0 
+                        ? `No articles found for "${searchQuery}". Try different keywords.`
+                        : `Found ${filteredNews.length} article${filteredNews.length === 1 ? '' : 's'} - Search completed!`
+                      }
+                    </p>
+                  )}
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {filteredNews.map((article) => (
-                    <NewsCard
-                      key={article.id}
-                      article={article}
-                      onClick={() => setSelectedArticle(article)}
-                    />
-                  ))}
-                </div>
+                
+                {loading ? (
+                  <div className="flex justify-center py-12">
+                    <LoadingSpinner />
+                  </div>
+                ) : filteredNews.length === 0 ? (
+                  <div className="text-center py-12">
+                    <h3 className="text-xl font-bold text-gray-700 mb-4">No results found</h3>
+                    <p className="text-gray-600 mb-6">
+                      Try searching with different keywords such as:
+                    </p>
+                    <div className="flex flex-wrap justify-center gap-2">
+                      {['technology', 'business', 'sports', 'health', 'politics', 'entertainment'].map((suggestion) => (
+                        <button
+                          key={suggestion}
+                          onClick={() => handleSearch(suggestion)}
+                          className="px-4 py-2 bg-gray-100 text-gray-700 rounded-full hover:bg-red-600 hover:text-white transition-all duration-300 text-sm font-medium"
+                        >
+                          {suggestion}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {filteredNews.map((article) => (
+                      <NewsCard
+                        key={article.id}
+                        article={article}
+                        onClick={() => setSelectedArticle(article)}
+                      />
+                    ))}
+                  </div>
+                )}
               </section>
             )}
 

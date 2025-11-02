@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 
-export default function ReadPage() {
+function ReadPageContent() {
   const params = useSearchParams();
   const title = params.get('t') || 'Article';
   const url = params.get('u') || '';
@@ -107,5 +107,20 @@ export default function ReadPage() {
         </article>
       </div>
     </main>
+  );
+}
+
+export default function ReadPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white flex items-center justify-center">
+        <div className="flex items-center text-gray-600">
+          <div className="w-6 h-6 border-3 border-gray-200 border-t-red-600 rounded-full animate-spin mr-4" />
+          <span className="text-lg font-medium">Loading article…</span>
+        </div>
+      </div>
+    }>
+      <ReadPageContent />
+    </Suspense>
   );
 }

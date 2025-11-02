@@ -68,17 +68,20 @@ export const useNews = (options: UseNewsOptions = {}) => {
             for (const line of lines) {
               if (line.startsWith('data: ')) {
                 const data = line.slice(6);
+                if (!data.trim()) continue; // Skip empty data
+                
                 try {
                   type SSEMessage = NewsItem[] | { error: string };
                   const parsed: SSEMessage = JSON.parse(data);
                   if (Array.isArray(parsed)) {
                     setNews(parsed);
+                    setError(null); // Clear any previous errors
                   } else if (parsed && 'error' in parsed) {
                     setError(parsed.error);
                   }
                 } catch (e) {
-                  console.error('Error parsing SSE data:', e);
-                  setError('Failed to process news data.');
+                  console.error('Error parsing SSE data:', e, 'Raw data:', data);
+                  // Don't set error for parsing issues, just log them
                 }
               }
             }
@@ -87,7 +90,11 @@ export const useNews = (options: UseNewsOptions = {}) => {
         .catch((err) => {
           if (err.name !== 'AbortError') {
             console.error('SSE Error:', err);
-            setError('Failed to connect to the news feed. Retrying...');
+            // Only show error if we don't already have news data loaded
+            if (news.length === 0) {
+              setError('Failed to connect to the news feed. Retrying...');
+            }
+            setLoading(false);
             // Retry after 5 seconds
             setTimeout(connectSSE, 5000);
           }

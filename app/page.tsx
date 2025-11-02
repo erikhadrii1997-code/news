@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useNews } from '../hooks/useNews';
 import SiteNavbar from '../components/SiteNavbar';
@@ -10,7 +10,7 @@ import ErrorMessage from '../components/ErrorMessage';
 import ArticleView from '../components/ArticleView';
 import { NewsItem } from '../lib/types';
 
-export default function HomePage() {
+function HomePageContent() {
   const params = useSearchParams();
   const [currentCategory, setCurrentCategory] = useState('general');
   const [searchQuery, setSearchQuery] = useState('');
@@ -194,5 +194,22 @@ export default function HomePage() {
         <ArticleView article={selectedArticle} onClose={() => setSelectedArticle(null)} />
       )}
     </div>
+  );
+}
+
+export default function HomePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white">
+        <div className="flex items-center justify-center h-screen">
+          <div className="flex items-center text-gray-600">
+            <div className="w-6 h-6 border-3 border-gray-200 border-t-red-600 rounded-full animate-spin mr-4" />
+            <span className="text-lg font-medium">Loading news…</span>
+          </div>
+        </div>
+      </div>
+    }>
+      <HomePageContent />
+    </Suspense>
   );
 }

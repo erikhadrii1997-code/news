@@ -6,7 +6,6 @@ import { useNews } from '../hooks/useNews';
 import SiteNavbar from '../components/SiteNavbar';
 import NewsCard from '../components/NewsCard';
 import LoadingSpinner from '../components/LoadingSpinner';
-import ErrorMessage from '../components/ErrorMessage';
 import ArticleView from '../components/ArticleView';
 import { NewsItem } from '../lib/types';
 
@@ -80,9 +79,8 @@ function HomePageContent() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {loading && <LoadingSpinner />}
-        {error && <ErrorMessage message={error} />}
 
-  {!loading && !error && filteredNews.length > 0 && (
+        {!loading && filteredNews.length > 0 && (
           <>
             <div className="mb-10">
               <h1 className="text-5xl font-extrabold text-gray-900 mb-8 relative">
@@ -178,7 +176,7 @@ function HomePageContent() {
           </>
         )}
 
-  {!loading && !error && filteredNews.length === 0 && (
+        {!loading && filteredNews.length === 0 && (
           <div className="text-center py-20">
             <h3 className="text-3xl font-bold text-gray-900 mb-4">No articles found</h3>
             <p className="text-lg text-gray-600">

@@ -147,7 +147,7 @@ export async function GET(req: NextRequest) {
               title: 'Global Leaders Gather for Climate Summit in New York',
               description: 'World leaders from over 150 countries are meeting in New York City for the annual climate summit, discussing new initiatives to combat climate change and reduce carbon emissions globally. The three-day summit brings together heads of state, environmental scientists, and industry leaders to address the urgent challenges posed by rising global temperatures. Key topics include renewable energy transitions, carbon pricing mechanisms, and international cooperation frameworks.',
               url: 'https://news.com/climate-summit-2025',
-              imageUrl: 'https://images.unsplash.com/photo-1573164713714-d95e436ab8d6?w=800&q=80',
+              imageUrl: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=800&q=80',
               publishedAt: new Date(now - 120000).toISOString(), // 2 minutes ago
               source: 'World News',
               category: cat,
@@ -264,7 +264,7 @@ export async function GET(req: NextRequest) {
               title: 'Global Leaders Gather for Climate Summit in New York',
               description: 'World leaders from over 150 countries are meeting in New York City for the annual climate summit, discussing new initiatives to combat climate change and reduce carbon emissions globally. The three-day summit brings together heads of state, environmental scientists, and industry leaders to address the urgent challenges posed by rising global temperatures. Key topics include renewable energy transitions, carbon pricing mechanisms, and international cooperation frameworks. Delegates are expected to announce new commitments to achieve net-zero emissions by 2050, with particular focus on supporting developing nations in their green transition. Several breakthrough technologies in carbon capture and sustainable agriculture will be showcased during the event.',
               url: 'https://news.com/climate-summit-2025',
-              imageUrl: 'https://images.unsplash.com/photo-1573164713714-d95e436ab8d6?w=800&q=80',
+              imageUrl: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=800&q=80',
               publishedAt: new Date().toISOString(),
               source: 'World News',
               category: cat,

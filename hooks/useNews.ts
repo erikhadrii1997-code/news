@@ -211,7 +211,7 @@ export const useNews = (options: UseNewsOptions = {}) => {
           title: 'Global Leaders Gather for Climate Summit in New York',
           description: 'World leaders from over 150 countries are meeting in New York City for the annual climate summit, discussing new initiatives to combat climate change and reduce carbon emissions globally. The three-day summit brings together heads of state, environmental scientists, and industry leaders to address the urgent challenges posed by rising global temperatures.',
           url: 'https://news.com/climate-summit-2025',
-          imageUrl: 'https://images.unsplash.com/photo-1569163139394-de4e5f43e4e3?w=800&q=80',
+          imageUrl: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=800&q=80',
           publishedAt: new Date(now - 60000).toISOString(),
           source: 'World News',
           category: cat,

@@ -65,9 +65,9 @@ const NewsCard: React.FC<NewsCardProps> = ({ article, onClick }) => {
       ];
     } else if (titleLower.includes('climate') || titleLower.includes('environment') || titleLower.includes('summit')) {
       return [
-        'https://images.unsplash.com/photo-1569163139394-de4798aa62b6?w=800&q=80',
-        'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&q=80',
-        'https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=800&q=80'
+        'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=800&q=80', // World leaders at climate summit
+        'https://images.unsplash.com/photo-1569163139394-de4798aa62b6?w=800&q=80', // Environmental action
+        'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&q=80'  // Climate conference
       ];
     } else if (titleLower.includes('politics') || titleLower.includes('election') || titleLower.includes('government')) {
       return [

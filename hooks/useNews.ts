@@ -13,6 +13,160 @@ interface UseNewsOptions {
 const STORAGE_KEY_PREFIX = 'pulse_news_cache_';
 const MAX_CACHED_ARTICLES_PER_CATEGORY = 5000; // Increased limit to keep all articles for a very long time
 
+// Advanced smart image selection based on article content analysis
+const getRelevantImage = (category: string, title: string = '', description: string = ''): string => {
+  const titleLower = title.toLowerCase();
+  const descriptionLower = description.toLowerCase();
+  const categoryLower = category.toLowerCase();
+  const contentText = `${titleLower} ${descriptionLower}`;
+  
+  // PEACE & DIPLOMACY - handshakes, treaties, international cooperation
+  if (contentText.includes('peace') || contentText.includes('agreement') || contentText.includes('treaty') || 
+      contentText.includes('diplomacy') || contentText.includes('diplomatic') || contentText.includes('cooperation') ||
+      contentText.includes('neighboring nations') || contentText.includes('border dispute') || contentText.includes('mediation') ||
+      contentText.includes('reconciliation') || contentText.includes('partnership') || contentText.includes('tension')) {
+    return 'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=800&q=80'; // Handshake/diplomacy
+  }
+  
+  // TECHNOLOGY & AI - modern tech, computers, digital
+  if (contentText.includes('tech') || contentText.includes('ai') || contentText.includes('artificial intelligence') ||
+      contentText.includes('computer') || contentText.includes('software') || contentText.includes('digital') ||
+      contentText.includes('innovation') || contentText.includes('coding') || contentText.includes('algorithm') ||
+      contentText.includes('robot') || contentText.includes('automation') || contentText.includes('startup')) {
+    return 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&q=80'; // Modern technology
+  }
+  
+  // BUSINESS & FINANCE - markets, economy, corporate
+  if (contentText.includes('business') || contentText.includes('market') || contentText.includes('economy') ||
+      contentText.includes('finance') || contentText.includes('stock') || contentText.includes('investment') ||
+      contentText.includes('corporate') || contentText.includes('company') || contentText.includes('profit') ||
+      contentText.includes('earnings') || contentText.includes('trade') || contentText.includes('economic')) {
+    return 'https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=800&q=80'; // Business/finance
+  }
+  
+  // SPORTS - football, basketball, athletics
+  if (contentText.includes('sport') || contentText.includes('football') || contentText.includes('soccer') ||
+      contentText.includes('basketball') || contentText.includes('olympic') || contentText.includes('athlete') ||
+      contentText.includes('championship') || contentText.includes('tournament') || contentText.includes('match') ||
+      contentText.includes('game') || contentText.includes('team') || contentText.includes('player')) {
+    return 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&q=80'; // Sports action
+  }
+  
+  // HEALTH & MEDICAL - hospitals, doctors, medical research
+  if (contentText.includes('health') || contentText.includes('medical') || contentText.includes('hospital') ||
+      contentText.includes('doctor') || contentText.includes('medicine') || contentText.includes('treatment') ||
+      contentText.includes('vaccine') || contentText.includes('virus') || contentText.includes('disease') ||
+      contentText.includes('patient') || contentText.includes('healthcare') || contentText.includes('surgery')) {
+    return 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=800&q=80'; // Medical/healthcare
+  }
+  
+  // SPACE & ASTRONOMY - moon, planets, NASA, space missions
+  if (contentText.includes('moon') || contentText.includes('supermoon') || contentText.includes('space') ||
+      contentText.includes('astronomy') || contentText.includes('planet') || contentText.includes('solar') ||
+      contentText.includes('nasa') || contentText.includes('galaxy') || contentText.includes('star') ||
+      contentText.includes('astronaut') || contentText.includes('satellite') || contentText.includes('rocket')) {
+    return 'https://images.unsplash.com/photo-1446776877081-d282a0f896e2?w=800&q=80'; // Space/astronomy
+  }
+  
+  // CLIMATE & ENVIRONMENT - earth, sustainability, climate change
+  if (contentText.includes('climate') || contentText.includes('environment') || contentText.includes('summit') ||
+      contentText.includes('earth') || contentText.includes('green') || contentText.includes('sustainability') ||
+      contentText.includes('carbon') || contentText.includes('emission') || contentText.includes('renewable') ||
+      contentText.includes('energy') || contentText.includes('pollution') || contentText.includes('conservation')) {
+    return 'https://images.unsplash.com/photo-1569163139394-de4798aa62b6?w=800&q=80'; // Environment/earth
+  }
+  
+  // ENTERTAINMENT - movies, music, celebrities
+  if (contentText.includes('entertainment') || contentText.includes('movie') || contentText.includes('music') ||
+      contentText.includes('celebrity') || contentText.includes('actor') || contentText.includes('film') ||
+      contentText.includes('concert') || contentText.includes('artist') || contentText.includes('hollywood') ||
+      contentText.includes('album') || contentText.includes('show') || contentText.includes('performance')) {
+    return 'https://images.unsplash.com/photo-1489599628687-6946bc4bb95e?w=800&q=80'; // Entertainment/concert
+  }
+  
+  // SCIENCE & RESEARCH - laboratories, studies, scientific discoveries
+  if (contentText.includes('science') || contentText.includes('research') || contentText.includes('study') ||
+      contentText.includes('laboratory') || contentText.includes('discovery') || contentText.includes('experiment') ||
+      contentText.includes('scientist') || contentText.includes('breakthrough') || contentText.includes('innovation') ||
+      contentText.includes('biology') || contentText.includes('chemistry') || contentText.includes('physics')) {
+    return 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80'; // Science/research
+  }
+  
+  // POLITICS & GOVERNMENT - elections, government buildings, political events
+  if (contentText.includes('politics') || contentText.includes('election') || contentText.includes('government') ||
+      contentText.includes('president') || contentText.includes('minister') || contentText.includes('parliament') ||
+      contentText.includes('congress') || contentText.includes('vote') || contentText.includes('campaign') ||
+      contentText.includes('policy') || contentText.includes('law') || contentText.includes('legislative')) {
+    return 'https://images.unsplash.com/photo-1531592937781-344ad608fabf?w=800&q=80'; // Government/politics
+  }
+  
+  // EDUCATION - schools, universities, learning
+  if (contentText.includes('education') || contentText.includes('school') || contentText.includes('university') ||
+      contentText.includes('college') || contentText.includes('student') || contentText.includes('teacher') ||
+      contentText.includes('learning') || contentText.includes('graduation') || contentText.includes('academic') ||
+      contentText.includes('classroom') || contentText.includes('scholarship') || contentText.includes('degree')) {
+    return 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=800&q=80'; // Education/library
+  }
+  
+  // TRAVEL & TOURISM - destinations, airports, vacations
+  if (contentText.includes('travel') || contentText.includes('tourism') || contentText.includes('vacation') ||
+      contentText.includes('airport') || contentText.includes('flight') || contentText.includes('hotel') ||
+      contentText.includes('destination') || contentText.includes('tourist') || contentText.includes('trip') ||
+      contentText.includes('holiday') || contentText.includes('airline') || contentText.includes('cruise')) {
+    return 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800&q=80'; // Travel/suitcase
+  }
+  
+  // FOOD & DINING - restaurants, cuisine, cooking
+  if (contentText.includes('food') || contentText.includes('restaurant') || contentText.includes('cooking') ||
+      contentText.includes('cuisine') || contentText.includes('chef') || contentText.includes('recipe') ||
+      contentText.includes('dining') || contentText.includes('meal') || contentText.includes('kitchen') ||
+      contentText.includes('nutrition') || contentText.includes('organic') || contentText.includes('grocery')) {
+    return 'https://images.unsplash.com/photo-1543353071-087092ec393a?w=800&q=80'; // Food/cooking
+  }
+  
+  // WEATHER & NATURAL DISASTERS - storms, hurricanes, natural events
+  if (contentText.includes('weather') || contentText.includes('storm') || contentText.includes('hurricane') ||
+      contentText.includes('earthquake') || contentText.includes('flood') || contentText.includes('drought') ||
+      contentText.includes('tornado') || contentText.includes('disaster') || contentText.includes('emergency') ||
+      contentText.includes('evacuation') || contentText.includes('wildfire') || contentText.includes('tsunami')) {
+    return 'https://images.unsplash.com/photo-1527482797697-8795b05a13fe?w=800&q=80'; // Storm/weather
+  }
+  
+  // CRIME & JUSTICE - court, police, legal matters
+  if (contentText.includes('crime') || contentText.includes('police') || contentText.includes('court') ||
+      contentText.includes('justice') || contentText.includes('legal') || contentText.includes('arrest') ||
+      contentText.includes('trial') || contentText.includes('investigation') || contentText.includes('verdict') ||
+      contentText.includes('lawsuit') || contentText.includes('criminal') || contentText.includes('prosecutor')) {
+    return 'https://images.unsplash.com/photo-1589994965851-a8f479c573a9?w=800&q=80'; // Justice/gavel
+  }
+  
+  // TRANSPORTATION - cars, trains, public transport
+  if (contentText.includes('transport') || contentText.includes('traffic') || contentText.includes('car') ||
+      contentText.includes('train') || contentText.includes('bus') || contentText.includes('subway') ||
+      contentText.includes('highway') || contentText.includes('vehicle') || contentText.includes('automotive') ||
+      contentText.includes('commute') || contentText.includes('infrastructure') || contentText.includes('road')) {
+    return 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=800&q=80'; // Transportation
+  }
+  
+  // Fallback to category-based images if no specific content match
+  if (categoryLower.includes('tech')) {
+    return 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&q=80';
+  } else if (categoryLower.includes('business')) {
+    return 'https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=800&q=80';
+  } else if (categoryLower.includes('sport')) {
+    return 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&q=80';
+  } else if (categoryLower.includes('health') || categoryLower.includes('medical')) {
+    return 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=800&q=80';
+  } else if (categoryLower.includes('entertainment')) {
+    return 'https://images.unsplash.com/photo-1489599628687-6946bc4bb95e?w=800&q=80';
+  } else if (categoryLower.includes('science')) {
+    return 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80';
+  } else {
+    // Default professional news image
+    return 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&q=80';
+  }
+};
+
 // Helper function to get cached articles from localStorage for a specific category
 // PRIORITY: Check multiple cache sources to ensure articles are always available
 const getCachedArticles = (category: string): NewsItem[] => {
@@ -241,7 +395,7 @@ export const useNews = (options: UseNewsOptions = {}) => {
           title: 'Historic Peace Agreement Signed Between Neighboring Nations',
           description: 'After decades of tension, two neighboring countries have signed a comprehensive peace agreement, marking a new era of cooperation and economic partnership in the region. The landmark accord addresses long-standing border disputes and establishes joint economic zones.',
           url: 'https://news.com/peace-agreement',
-          imageUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80',
+          imageUrl: 'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=800&q=80',
           publishedAt: new Date(now - 240000).toISOString(),
           source: 'International Times',
           category: cat,

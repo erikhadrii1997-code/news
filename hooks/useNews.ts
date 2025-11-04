@@ -245,6 +245,167 @@ export const useNews = (options: UseNewsOptions = {}) => {
           publishedAt: new Date(now - 240000).toISOString(),
           source: 'International Times',
           category: cat,
+        },
+        // Additional articles to ensure Latest Stories section (positions 5-16) has content
+        {
+          id: `fallback-general-5-${now}`,
+          title: 'Educational Technology Initiative Launches Nationwide',
+          description: 'A comprehensive educational technology program is being rolled out across schools nationwide, providing students with access to cutting-edge learning tools and resources. The initiative aims to bridge the digital divide and enhance educational outcomes.',
+          url: 'https://news.com/education-tech-initiative',
+          imageUrl: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=800&q=80',
+          publishedAt: new Date(now - 300000).toISOString(),
+          source: 'Education Weekly',
+          category: cat,
+        },
+        {
+          id: `fallback-general-6-${now}`,
+          title: 'Renewable Energy Project Creates Thousands of Jobs',
+          description: 'A massive renewable energy project in the Midwest is expected to create over 15,000 jobs while generating clean electricity for millions of homes. The solar and wind farm complex represents a major step toward sustainable energy independence.',
+          url: 'https://news.com/renewable-energy-jobs',
+          imageUrl: 'https://images.unsplash.com/photo-1466611653911-95081537e5b7?w=800&q=80',
+          publishedAt: new Date(now - 360000).toISOString(),
+          source: 'Energy Today',
+          category: cat,
+        },
+        {
+          id: `fallback-general-7-${now}`,
+          title: 'Cultural Festival Celebrates Community Diversity',
+          description: 'The annual cultural festival brought together communities from diverse backgrounds to celebrate traditions, arts, and cuisine. Over 50,000 attendees enjoyed performances, workshops, and exhibitions showcasing the rich cultural heritage of the region.',
+          url: 'https://news.com/cultural-festival',
+          imageUrl: 'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=800&q=80',
+          publishedAt: new Date(now - 420000).toISOString(),
+          source: 'Community News',
+          category: cat,
+        },
+        {
+          id: `fallback-general-8-${now}`,
+          title: 'Transportation Innovation Reduces Urban Congestion',
+          description: 'Smart traffic management systems and innovative transportation solutions are successfully reducing congestion in major urban areas by up to 30%. The integrated approach combines real-time data analytics with sustainable mobility options.',
+          url: 'https://news.com/transportation-innovation',
+          imageUrl: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800&q=80',
+          publishedAt: new Date(now - 480000).toISOString(),
+          source: 'Urban Planning',
+          category: cat,
+        },
+        {
+          id: `fallback-general-9-${now}`,
+          title: 'Scientific Breakthrough Advances Medical Research',
+          description: 'Researchers have made a significant breakthrough in understanding cellular regeneration, potentially leading to new treatments for age-related diseases and improved recovery from injuries. Clinical trials are expected to begin next year.',
+          url: 'https://news.com/medical-breakthrough',
+          imageUrl: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=800&q=80',
+          publishedAt: new Date(now - 540000).toISOString(),
+          source: 'Medical Journal',
+          category: cat,
+        },
+        {
+          id: `fallback-general-10-${now}`,
+          title: 'Environmental Restoration Project Shows Remarkable Results',
+          description: 'A decade-long environmental restoration project has successfully revitalized degraded ecosystems, with wildlife populations returning to historic levels. The project serves as a model for similar initiatives worldwide.',
+          url: 'https://news.com/environmental-restoration',
+          imageUrl: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&q=80',
+          publishedAt: new Date(now - 600000).toISOString(),
+          source: 'Environmental Science',
+          category: cat,
+        },
+        {
+          id: `fallback-general-11-${now}`,
+          title: 'Youth Entrepreneurship Program Empowers Next Generation',
+          description: 'A groundbreaking youth entrepreneurship program has helped over 5,000 young people launch successful businesses, creating a new generation of innovative leaders and contributing to economic growth in underserved communities.',
+          url: 'https://news.com/youth-entrepreneurship',
+          imageUrl: 'https://images.unsplash.com/photo-1556157382-97eda2d62296?w=800&q=80',
+          publishedAt: new Date(now - 660000).toISOString(),
+          source: 'Business Weekly',
+          category: cat,
+        },
+        {
+          id: `fallback-general-12-${now}`,
+          title: 'Digital Infrastructure Upgrade Connects Rural Communities',
+          description: 'A comprehensive digital infrastructure upgrade is bringing high-speed internet access to remote rural communities, opening new opportunities for education, healthcare, and economic development in previously underserved areas.',
+          url: 'https://news.com/digital-infrastructure',
+          imageUrl: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80',
+          publishedAt: new Date(now - 720000).toISOString(),
+          source: 'Technology Today',
+          category: cat,
+        },
+        {
+          id: `fallback-general-13-${now}`,
+          title: 'International Trade Partnership Boosts Economic Growth',
+          description: 'A new international trade partnership agreement is expected to boost economic growth by creating new markets for local businesses and attracting foreign investment. The deal emphasizes fair trade practices and sustainable development.',
+          url: 'https://news.com/trade-partnership',
+          imageUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80',
+          publishedAt: new Date(now - 780000).toISOString(),
+          source: 'Economic Times',
+          category: cat,
+        },
+        {
+          id: `fallback-general-14-${now}`,
+          title: 'Mental Health Initiative Expands Support Services',
+          description: 'A comprehensive mental health initiative is expanding support services to reach more communities, providing accessible counseling, crisis intervention, and wellness programs. The program has already helped thousands of individuals.',
+          url: 'https://news.com/mental-health-initiative',
+          imageUrl: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=800&q=80',
+          publishedAt: new Date(now - 840000).toISOString(),
+          source: 'Health & Wellness',
+          category: cat,
+        },
+        {
+          id: `fallback-general-15-${now}`,
+          title: 'Space Technology Collaboration Advances Scientific Discovery',
+          description: 'International space agencies are collaborating on groundbreaking research missions that promise to advance our understanding of the universe. The partnership combines resources and expertise to explore new frontiers.',
+          url: 'https://news.com/space-collaboration',
+          imageUrl: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80',
+          publishedAt: new Date(now - 900000).toISOString(),
+          source: 'Space News',
+          category: cat,
+        },
+        {
+          id: `fallback-general-16-${now}`,
+          title: 'Agricultural Innovation Increases Food Security',
+          description: 'Advanced agricultural techniques and sustainable farming practices are increasing crop yields while protecting the environment. These innovations are crucial for ensuring food security for growing global populations.',
+          url: 'https://news.com/agricultural-innovation',
+          imageUrl: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=800&q=80',
+          publishedAt: new Date(now - 960000).toISOString(),
+          source: 'Agriculture Today',
+          category: cat,
+        },
+        {
+          id: `fallback-general-17-${now}`,
+          title: 'Smart City Initiative Improves Quality of Life',
+          description: 'A comprehensive smart city initiative is using technology and data analytics to improve urban services, reduce energy consumption, and enhance the quality of life for residents. The project serves as a model for sustainable urban development.',
+          url: 'https://news.com/smart-city-initiative',
+          imageUrl: 'https://images.unsplash.com/photo-1480714378408-67cf0d13bc1f?w=800&q=80',
+          publishedAt: new Date(now - 1020000).toISOString(),
+          source: 'Urban Innovation',
+          category: cat,
+        },
+        {
+          id: `fallback-general-18-${now}`,
+          title: 'Water Conservation Program Achieves Remarkable Success',
+          description: 'A community-led water conservation program has achieved remarkable success in reducing water usage by 40% while maintaining quality of life. The initiative combines technology, education, and community engagement.',
+          url: 'https://news.com/water-conservation',
+          imageUrl: 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=800&q=80',
+          publishedAt: new Date(now - 1080000).toISOString(),
+          source: 'Environmental News',
+          category: cat,
+        },
+        {
+          id: `fallback-general-19-${now}`,
+          title: 'Cultural Heritage Preservation Project Safeguards History',
+          description: 'A major cultural heritage preservation project is using advanced technology to document and protect historical sites and artifacts. The initiative ensures that future generations can appreciate and learn from our shared cultural legacy.',
+          url: 'https://news.com/heritage-preservation',
+          imageUrl: 'https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=800&q=80',
+          publishedAt: new Date(now - 1140000).toISOString(),
+          source: 'Cultural Heritage',
+          category: cat,
+        },
+        {
+          id: `fallback-general-20-${now}`,
+          title: 'Sports Development Program Promotes Youth Engagement',
+          description: 'A comprehensive sports development program is promoting youth engagement and healthy lifestyles while building community connections. The initiative has reached over 25,000 young people across multiple communities.',
+          url: 'https://news.com/sports-development',
+          imageUrl: 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=800&q=80',
+          publishedAt: new Date(now - 1200000).toISOString(),
+          source: 'Sports & Community',
+          category: cat,
         }
       ],
       technology: [
@@ -320,18 +481,19 @@ export const useNews = (options: UseNewsOptions = {}) => {
     // Get category-specific fallback articles, or use general as fallback
     const categoryFallback = fallbackByCategory[cat] || fallbackByCategory.general;
     
-    // ALWAYS include some general articles for variety
-    const generalArticles = fallbackByCategory.general.slice(0, 2);
+    // CRITICAL: Include ALL general articles to ensure Latest Stories section has content
+    // Latest Stories needs positions 5-16, so we need minimum 17 articles total
+    const allGeneralArticles = fallbackByCategory.general;
     
-    // Combine category-specific with general articles
-    const combined = [...categoryFallback, ...generalArticles];
+    // Combine category-specific with ALL general articles for ultra-reliability
+    const combined = [...categoryFallback, ...allGeneralArticles];
     
     // Ensure unique articles
     const unique = combined.filter((article, index, self) => 
       index === self.findIndex(a => a.url === article.url)
     );
     
-    console.log(`[FALLBACK] Generated ${unique.length} fallback articles for ${cat}`);
+    console.log(`[FALLBACK] Generated ${unique.length} fallback articles for ${cat} - ENSURES LATEST STORIES CONTENT`);
     return unique;
   };
 

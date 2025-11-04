@@ -42,158 +42,335 @@ const tryApiCall = async (url: string, timeout: number = 2000): Promise<any> => 
   throw new Error('No valid API response received');
 };
 
-// Advanced smart image selection based on article content analysis
-const getRelevantImage = (category: string, title: string = '', description: string = ''): string => {
+// Global image tracking to ensure no duplicates across all articles
+const usedImages = new Set<string>();
+
+// Comprehensive image pools for each category with multiple relevant options
+const IMAGE_POOLS = {
+  peace: [
+    'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=800&q=80', // Handshake/diplomacy
+    'https://images.unsplash.com/photo-1569173112611-52a7cd38bea9?w=800&q=80', // Peace dove
+    'https://images.unsplash.com/photo-1573164713988-8665fc963095?w=800&q=80', // United Nations
+    'https://images.unsplash.com/photo-1541692641319-981cc79ee10e?w=800&q=80', // World peace
+    'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&q=80', // Diplomatic meeting
+    'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=800&q=80', // International cooperation
+    'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&q=80', // Treaty signing
+    'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800&q=80'  // Global partnership
+  ],
+  technology: [
+    'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&q=80', // Modern technology
+    'https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=800&q=80', // AI circuit
+    'https://images.unsplash.com/photo-1535378620166-273708d44e4c?w=800&q=80', // Digital innovation
+    'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&q=80', // Robot technology
+    'https://images.unsplash.com/photo-1504639725590-34d0984388bd?w=800&q=80', // Code development
+    'https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=800&q=80', // Computer chip
+    'https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7?w=800&q=80', // Software engineering
+    'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80'  // Digital workspace
+  ],
+  business: [
+    'https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=800&q=80', // Business/finance
+    'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800&q=80', // Stock market
+    'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80', // Corporate meeting
+    'https://images.unsplash.com/photo-1556761175-4b46a572b786?w=800&q=80', // Investment growth
+    'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80', // Business analytics
+    'https://images.unsplash.com/photo-1544377193-33dcf4d68fb5?w=800&q=80', // Economic data
+    'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80', // Financial planning
+    'https://images.unsplash.com/photo-1573164713988-8665fc963095?w=800&q=80'  // Business strategy
+  ],
+  sports: [
+    'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&q=80', // Sports action
+    'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=800&q=80', // Football stadium
+    'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=800&q=80', // Basketball court
+    'https://images.unsplash.com/photo-1577223625816-7546f13df25d?w=800&q=80', // Soccer field
+    'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&q=80', // Olympic rings
+    'https://images.unsplash.com/photo-1544966503-7cc5ac882d5f?w=800&q=80', // Athletic track
+    'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&q=80', // Tennis match
+    'https://images.unsplash.com/photo-1593073862407-a3ce22748763?w=800&q=80'  // Sports equipment
+  ],
+  health: [
+    'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=800&q=80', // Medical/healthcare
+    'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&q=80', // Hospital
+    'https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=800&q=80', // Medical research
+    'https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=800&q=80', // Doctor consultation
+    'https://images.unsplash.com/photo-1584515933487-779824d29309?w=800&q=80', // Vaccine/medicine
+    'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?w=800&q=80', // Medical equipment
+    'https://images.unsplash.com/photo-1609188076864-c35269136f09?w=800&q=80', // Healthcare worker
+    'https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=800&q=80'  // Medical laboratory
+  ],
+  space: [
+    'https://images.unsplash.com/photo-1446776877081-d282a0f896e2?w=800&q=80', // Space/astronomy
+    'https://images.unsplash.com/photo-1502134249126-9f3755a50d78?w=800&q=80', // Galaxy
+    'https://images.unsplash.com/photo-1444927714506-8492d94b5ba0?w=800&q=80', // Moon surface
+    'https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?w=800&q=80', // NASA mission
+    'https://images.unsplash.com/photo-1534796636912-3b95b3ab5986?w=800&q=80', // Solar system
+    'https://images.unsplash.com/photo-1542736634-95b40c90f4d0?w=800&q=80', // Astronaut
+    'https://images.unsplash.com/photo-1527431016-0f4a5f8a89a2?w=800&q=80', // Space station
+    'https://images.unsplash.com/photo-1457364887197-9150188c107b?w=800&q=80'  // Planet earth
+  ],
+  climate: [
+    'https://images.unsplash.com/photo-1569163139394-de4798aa62b6?w=800&q=80', // Environment/earth
+    'https://images.unsplash.com/photo-1611273426858-450d8e3c9fce?w=800&q=80', // Climate change
+    'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80', // Renewable energy
+    'https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=800&q=80', // Green forest
+    'https://images.unsplash.com/photo-1551808525-51a94da548ce?w=800&q=80', // Solar panels
+    'https://images.unsplash.com/photo-1497436072909-f5e4be1713a1?w=800&q=80', // Wind turbines
+    'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&q=80', // Earth conservation
+    'https://images.unsplash.com/photo-1567024406807-8bb8d7d31c1d?w=800&q=80'  // Environmental summit
+  ],
+  entertainment: [
+    'https://images.unsplash.com/photo-1489599628687-6946bc4bb95e?w=800&q=80', // Entertainment/concert
+    'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80', // Music performance
+    'https://images.unsplash.com/photo-1485846234645-a62644f84728?w=800&q=80', // Movie theater
+    'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800&q=80', // Awards ceremony
+    'https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=800&q=80', // Film production
+    'https://images.unsplash.com/photo-1501612780327-45045538702b?w=800&q=80', // Celebrity event
+    'https://images.unsplash.com/photo-1516280440614-37939bbacd81?w=800&q=80', // Concert stage
+    'https://images.unsplash.com/photo-1486842554110-8b8e0671a4b1?w=800&q=80'  // Entertainment industry
+  ],
+  science: [
+    'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80', // Science/research
+    'https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=800&q=80', // Laboratory
+    'https://images.unsplash.com/photo-1582719508461-905c673771fd?w=800&q=80', // Scientific discovery
+    'https://images.unsplash.com/photo-1554475901-4538ddfbccc2?w=800&q=80', // Research facility
+    'https://images.unsplash.com/photo-1567427018141-0584cfcbf1b8?w=800&q=80', // Chemistry lab
+    'https://images.unsplash.com/photo-1628595351029-c2bf17511435?w=800&q=80', // Scientific experiment
+    'https://images.unsplash.com/photo-1576319155264-99536e0be1ee?w=800&q=80', // DNA research
+    'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=800&q=80'  // Medical science
+  ],
+  politics: [
+    'https://images.unsplash.com/photo-1531592937781-344ad608fabf?w=800&q=80', // Government/politics
+    'https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?w=800&q=80', // Political meeting
+    'https://images.unsplash.com/photo-1541692641319-981cc79ee10e?w=800&q=80', // Government building
+    'https://images.unsplash.com/photo-1569173112611-52a7cd38bea9?w=800&q=80', // Capitol building
+    'https://images.unsplash.com/photo-1586953208448-b95a79798f07?w=800&q=80', // Voting ballot
+    'https://images.unsplash.com/photo-1586953208448-b95a79798f07?w=800&q=80', // Election campaign
+    'https://images.unsplash.com/photo-1557804506-669a67965ba0?w=800&q=80', // Parliament session
+    'https://images.unsplash.com/photo-1573164713988-8665fc963095?w=800&q=80'  // Political debate
+  ],
+  education: [
+    'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=800&q=80', // Education/library
+    'https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=800&q=80', // University campus
+    'https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=800&q=80', // Graduation ceremony
+    'https://images.unsplash.com/photo-1509062522246-3755977927d7?w=800&q=80', // Classroom learning
+    'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=800&q=80', // Books and learning
+    'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&q=80', // Students studying
+    'https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?w=800&q=80', // Educational technology
+    'https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=800&q=80'  // Academic research
+  ],
+  travel: [
+    'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800&q=80', // Travel/suitcase
+    'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=800&q=80', // Airport departure
+    'https://images.unsplash.com/photo-1464207687429-7505649dae38?w=800&q=80', // Tourist destination
+    'https://images.unsplash.com/photo-1553149907-b5507615f2c6?w=800&q=80', // Travel photography
+    'https://images.unsplash.com/photo-1542640244-7e672d6cef4e?w=800&q=80', // Vacation resort
+    'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800&q=80', // Adventure travel
+    'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80', // Cultural tourism
+    'https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800&q=80'  // Travel exploration
+  ],
+  food: [
+    'https://images.unsplash.com/photo-1543353071-087092ec393a?w=800&q=80', // Food/cooking
+    'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&q=80', // Restaurant dining
+    'https://images.unsplash.com/photo-1577219491135-ce391730fb2c?w=800&q=80', // Gourmet cuisine
+    'https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=800&q=80', // Fresh ingredients
+    'https://images.unsplash.com/photo-1556909045-f8b47bb49dec?w=800&q=80', // Chef cooking
+    'https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=800&q=80', // Healthy food
+    'https://images.unsplash.com/photo-1571167133794-c0357e2efc9a?w=800&q=80', // Food festival
+    'https://images.unsplash.com/photo-1518779578993-ec3579fee39f?w=800&q=80'  // Culinary arts
+  ],
+  weather: [
+    'https://images.unsplash.com/photo-1527482797697-8795b05a13fe?w=800&q=80', // Storm/weather
+    'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80', // Hurricane tracking
+    'https://images.unsplash.com/photo-1586260439319-33dc0a9c3f1c?w=800&q=80', // Severe weather
+    'https://images.unsplash.com/photo-1535575424-b0c59fbcf3f9?w=800&q=80', // Lightning storm
+    'https://images.unsplash.com/photo-1509695507497-903c140c43b0?w=800&q=80', // Tornado warning
+    'https://images.unsplash.com/photo-1544718536-8f68836467b5?w=800&q=80', // Flood emergency
+    'https://images.unsplash.com/photo-1518837167922-ddd27525d352?w=800&q=80', // Drought conditions
+    'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80'  // Climate monitoring
+  ],
+  crime: [
+    'https://images.unsplash.com/photo-1589994965851-a8f479c573a9?w=800&q=80', // Justice/gavel
+    'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=800&q=80', // Police investigation
+    'https://images.unsplash.com/photo-1511376777868-611b54f68947?w=800&q=80', // Courthouse justice
+    'https://images.unsplash.com/photo-1573164713988-8665fc963095?w=800&q=80', // Legal proceedings
+    'https://images.unsplash.com/photo-1569163139394-de4798aa62b6?w=800&q=80', // Court trial
+    'https://images.unsplash.com/photo-1556075798-4825dfaaf498?w=800&q=80', // Law enforcement
+    'https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?w=800&q=80', // Criminal justice
+    'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?w=800&q=80'  // Legal system
+  ],
+  transportation: [
+    'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=800&q=80', // Transportation
+    'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=800&q=80', // Urban transit
+    'https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=800&q=80', // Railway system
+    'https://images.unsplash.com/photo-1541216970279-affbfdd55aa8?w=800&q=80', // Automotive industry
+    'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80', // Highway infrastructure
+    'https://images.unsplash.com/photo-1557804506-669a67965ba0?w=800&q=80', // Public transport
+    'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800&q=80', // Traffic management
+    'https://images.unsplash.com/photo-1556075798-4825dfaaf498?w=800&q=80'  // Transportation hub
+  ],
+  default: [
+    'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&q=80', // Professional news
+    'https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=800&q=80', // Global news
+    'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=800&q=80', // Breaking news
+    'https://images.unsplash.com/photo-1559757146-f8b8b38dd75b?w=800&q=80', // World events
+    'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800&q=80', // International news
+    'https://images.unsplash.com/photo-1569163139394-de4798aa62b6?w=800&q=80', // Current affairs
+    'https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=800&q=80', // Media coverage
+    'https://images.unsplash.com/photo-1531592937781-344ad608fabf?w=800&q=80'  // News reporting
+  ]
+};
+
+// Function to get unique relevant image based on content with no duplicates
+const getUniqueRelevantImage = (category: string, title: string = '', description: string = ''): string => {
   const titleLower = title.toLowerCase();
   const descriptionLower = description.toLowerCase();
   const categoryLower = category.toLowerCase();
   const contentText = `${titleLower} ${descriptionLower}`;
+  
+  let selectedPool: string[] = [];
   
   // PEACE & DIPLOMACY - handshakes, treaties, international cooperation
   if (contentText.includes('peace') || contentText.includes('agreement') || contentText.includes('treaty') || 
       contentText.includes('diplomacy') || contentText.includes('diplomatic') || contentText.includes('cooperation') ||
       contentText.includes('neighboring nations') || contentText.includes('border dispute') || contentText.includes('mediation') ||
       contentText.includes('reconciliation') || contentText.includes('partnership') || contentText.includes('tension')) {
-    return 'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=800&q=80'; // Handshake/diplomacy
+    selectedPool = IMAGE_POOLS.peace;
   }
-  
   // TECHNOLOGY & AI - modern tech, computers, digital
-  if (contentText.includes('tech') || contentText.includes('ai') || contentText.includes('artificial intelligence') ||
+  else if (contentText.includes('tech') || contentText.includes('ai') || contentText.includes('artificial intelligence') ||
       contentText.includes('computer') || contentText.includes('software') || contentText.includes('digital') ||
       contentText.includes('innovation') || contentText.includes('coding') || contentText.includes('algorithm') ||
       contentText.includes('robot') || contentText.includes('automation') || contentText.includes('startup')) {
-    return 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&q=80'; // Modern technology
+    selectedPool = IMAGE_POOLS.technology;
   }
-  
   // BUSINESS & FINANCE - markets, economy, corporate
-  if (contentText.includes('business') || contentText.includes('market') || contentText.includes('economy') ||
+  else if (contentText.includes('business') || contentText.includes('market') || contentText.includes('economy') ||
       contentText.includes('finance') || contentText.includes('stock') || contentText.includes('investment') ||
       contentText.includes('corporate') || contentText.includes('company') || contentText.includes('profit') ||
       contentText.includes('earnings') || contentText.includes('trade') || contentText.includes('economic')) {
-    return 'https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=800&q=80'; // Business/finance
+    selectedPool = IMAGE_POOLS.business;
   }
-  
   // SPORTS - football, basketball, athletics
-  if (contentText.includes('sport') || contentText.includes('football') || contentText.includes('soccer') ||
+  else if (contentText.includes('sport') || contentText.includes('football') || contentText.includes('soccer') ||
       contentText.includes('basketball') || contentText.includes('olympic') || contentText.includes('athlete') ||
       contentText.includes('championship') || contentText.includes('tournament') || contentText.includes('match') ||
       contentText.includes('game') || contentText.includes('team') || contentText.includes('player')) {
-    return 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&q=80'; // Sports action
+    selectedPool = IMAGE_POOLS.sports;
   }
-  
   // HEALTH & MEDICAL - hospitals, doctors, medical research
-  if (contentText.includes('health') || contentText.includes('medical') || contentText.includes('hospital') ||
+  else if (contentText.includes('health') || contentText.includes('medical') || contentText.includes('hospital') ||
       contentText.includes('doctor') || contentText.includes('medicine') || contentText.includes('treatment') ||
       contentText.includes('vaccine') || contentText.includes('virus') || contentText.includes('disease') ||
       contentText.includes('patient') || contentText.includes('healthcare') || contentText.includes('surgery')) {
-    return 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=800&q=80'; // Medical/healthcare
+    selectedPool = IMAGE_POOLS.health;
   }
-  
   // SPACE & ASTRONOMY - moon, planets, NASA, space missions
-  if (contentText.includes('moon') || contentText.includes('supermoon') || contentText.includes('space') ||
+  else if (contentText.includes('moon') || contentText.includes('supermoon') || contentText.includes('space') ||
       contentText.includes('astronomy') || contentText.includes('planet') || contentText.includes('solar') ||
       contentText.includes('nasa') || contentText.includes('galaxy') || contentText.includes('star') ||
       contentText.includes('astronaut') || contentText.includes('satellite') || contentText.includes('rocket')) {
-    return 'https://images.unsplash.com/photo-1446776877081-d282a0f896e2?w=800&q=80'; // Space/astronomy
+    selectedPool = IMAGE_POOLS.space;
   }
-  
   // CLIMATE & ENVIRONMENT - earth, sustainability, climate change
-  if (contentText.includes('climate') || contentText.includes('environment') || contentText.includes('summit') ||
+  else if (contentText.includes('climate') || contentText.includes('environment') || contentText.includes('summit') ||
       contentText.includes('earth') || contentText.includes('green') || contentText.includes('sustainability') ||
       contentText.includes('carbon') || contentText.includes('emission') || contentText.includes('renewable') ||
       contentText.includes('energy') || contentText.includes('pollution') || contentText.includes('conservation')) {
-    return 'https://images.unsplash.com/photo-1569163139394-de4798aa62b6?w=800&q=80'; // Environment/earth
+    selectedPool = IMAGE_POOLS.climate;
   }
-  
   // ENTERTAINMENT - movies, music, celebrities
-  if (contentText.includes('entertainment') || contentText.includes('movie') || contentText.includes('music') ||
+  else if (contentText.includes('entertainment') || contentText.includes('movie') || contentText.includes('music') ||
       contentText.includes('celebrity') || contentText.includes('actor') || contentText.includes('film') ||
       contentText.includes('concert') || contentText.includes('artist') || contentText.includes('hollywood') ||
       contentText.includes('album') || contentText.includes('show') || contentText.includes('performance')) {
-    return 'https://images.unsplash.com/photo-1489599628687-6946bc4bb95e?w=800&q=80'; // Entertainment/concert
+    selectedPool = IMAGE_POOLS.entertainment;
   }
-  
   // SCIENCE & RESEARCH - laboratories, studies, scientific discoveries
-  if (contentText.includes('science') || contentText.includes('research') || contentText.includes('study') ||
+  else if (contentText.includes('science') || contentText.includes('research') || contentText.includes('study') ||
       contentText.includes('laboratory') || contentText.includes('discovery') || contentText.includes('experiment') ||
       contentText.includes('scientist') || contentText.includes('breakthrough') || contentText.includes('innovation') ||
       contentText.includes('biology') || contentText.includes('chemistry') || contentText.includes('physics')) {
-    return 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80'; // Science/research
+    selectedPool = IMAGE_POOLS.science;
   }
-  
   // POLITICS & GOVERNMENT - elections, government buildings, political events
-  if (contentText.includes('politics') || contentText.includes('election') || contentText.includes('government') ||
+  else if (contentText.includes('politics') || contentText.includes('election') || contentText.includes('government') ||
       contentText.includes('president') || contentText.includes('minister') || contentText.includes('parliament') ||
       contentText.includes('congress') || contentText.includes('vote') || contentText.includes('campaign') ||
       contentText.includes('policy') || contentText.includes('law') || contentText.includes('legislative')) {
-    return 'https://images.unsplash.com/photo-1531592937781-344ad608fabf?w=800&q=80'; // Government/politics
+    selectedPool = IMAGE_POOLS.politics;
   }
-  
   // EDUCATION - schools, universities, learning
-  if (contentText.includes('education') || contentText.includes('school') || contentText.includes('university') ||
+  else if (contentText.includes('education') || contentText.includes('school') || contentText.includes('university') ||
       contentText.includes('college') || contentText.includes('student') || contentText.includes('teacher') ||
       contentText.includes('learning') || contentText.includes('graduation') || contentText.includes('academic') ||
       contentText.includes('classroom') || contentText.includes('scholarship') || contentText.includes('degree')) {
-    return 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=800&q=80'; // Education/library
+    selectedPool = IMAGE_POOLS.education;
   }
-  
   // TRAVEL & TOURISM - destinations, airports, vacations
-  if (contentText.includes('travel') || contentText.includes('tourism') || contentText.includes('vacation') ||
+  else if (contentText.includes('travel') || contentText.includes('tourism') || contentText.includes('vacation') ||
       contentText.includes('airport') || contentText.includes('flight') || contentText.includes('hotel') ||
       contentText.includes('destination') || contentText.includes('tourist') || contentText.includes('trip') ||
       contentText.includes('holiday') || contentText.includes('airline') || contentText.includes('cruise')) {
-    return 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800&q=80'; // Travel/suitcase
+    selectedPool = IMAGE_POOLS.travel;
   }
-  
   // FOOD & DINING - restaurants, cuisine, cooking
-  if (contentText.includes('food') || contentText.includes('restaurant') || contentText.includes('cooking') ||
+  else if (contentText.includes('food') || contentText.includes('restaurant') || contentText.includes('cooking') ||
       contentText.includes('cuisine') || contentText.includes('chef') || contentText.includes('recipe') ||
       contentText.includes('dining') || contentText.includes('meal') || contentText.includes('kitchen') ||
       contentText.includes('nutrition') || contentText.includes('organic') || contentText.includes('grocery')) {
-    return 'https://images.unsplash.com/photo-1543353071-087092ec393a?w=800&q=80'; // Food/cooking
+    selectedPool = IMAGE_POOLS.food;
   }
-  
   // WEATHER & NATURAL DISASTERS - storms, hurricanes, natural events
-  if (contentText.includes('weather') || contentText.includes('storm') || contentText.includes('hurricane') ||
+  else if (contentText.includes('weather') || contentText.includes('storm') || contentText.includes('hurricane') ||
       contentText.includes('earthquake') || contentText.includes('flood') || contentText.includes('drought') ||
       contentText.includes('tornado') || contentText.includes('disaster') || contentText.includes('emergency') ||
       contentText.includes('evacuation') || contentText.includes('wildfire') || contentText.includes('tsunami')) {
-    return 'https://images.unsplash.com/photo-1527482797697-8795b05a13fe?w=800&q=80'; // Storm/weather
+    selectedPool = IMAGE_POOLS.weather;
   }
-  
   // CRIME & JUSTICE - court, police, legal matters
-  if (contentText.includes('crime') || contentText.includes('police') || contentText.includes('court') ||
+  else if (contentText.includes('crime') || contentText.includes('police') || contentText.includes('court') ||
       contentText.includes('justice') || contentText.includes('legal') || contentText.includes('arrest') ||
       contentText.includes('trial') || contentText.includes('investigation') || contentText.includes('verdict') ||
       contentText.includes('lawsuit') || contentText.includes('criminal') || contentText.includes('prosecutor')) {
-    return 'https://images.unsplash.com/photo-1589994965851-a8f479c573a9?w=800&q=80'; // Justice/gavel
+    selectedPool = IMAGE_POOLS.crime;
   }
-  
   // TRANSPORTATION - cars, trains, public transport
-  if (contentText.includes('transport') || contentText.includes('traffic') || contentText.includes('car') ||
+  else if (contentText.includes('transport') || contentText.includes('traffic') || contentText.includes('car') ||
       contentText.includes('train') || contentText.includes('bus') || contentText.includes('subway') ||
       contentText.includes('highway') || contentText.includes('vehicle') || contentText.includes('automotive') ||
       contentText.includes('commute') || contentText.includes('infrastructure') || contentText.includes('road')) {
-    return 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=800&q=80'; // Transportation
+    selectedPool = IMAGE_POOLS.transportation;
+  }
+  // Fallback to category-based selection
+  else if (categoryLower.includes('tech')) {
+    selectedPool = IMAGE_POOLS.technology;
+  } else if (categoryLower.includes('business')) {
+    selectedPool = IMAGE_POOLS.business;
+  } else if (categoryLower.includes('sport')) {
+    selectedPool = IMAGE_POOLS.sports;
+  } else if (categoryLower.includes('health') || categoryLower.includes('medical')) {
+    selectedPool = IMAGE_POOLS.health;
+  } else if (categoryLower.includes('entertainment')) {
+    selectedPool = IMAGE_POOLS.entertainment;
+  } else if (categoryLower.includes('science')) {
+    selectedPool = IMAGE_POOLS.science;
+  } else {
+    selectedPool = IMAGE_POOLS.default;
   }
   
-  // Fallback to category-based images if no specific content match
-  if (categoryLower.includes('tech')) {
-    return 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&q=80';
-  } else if (categoryLower.includes('business')) {
-    return 'https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=800&q=80';
-  } else if (categoryLower.includes('sport')) {
-    return 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&q=80';
-  } else if (categoryLower.includes('health') || categoryLower.includes('medical')) {
-    return 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=800&q=80';
-  } else if (categoryLower.includes('entertainment')) {
-    return 'https://images.unsplash.com/photo-1489599628687-6946bc4bb95e?w=800&q=80';
-  } else if (categoryLower.includes('science')) {
-    return 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80';
-  } else {
-    // Default professional news image
-    return 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&q=80';
+  // Find first unused image from the selected pool
+  for (const imageUrl of selectedPool) {
+    if (!usedImages.has(imageUrl)) {
+      usedImages.add(imageUrl);
+      return imageUrl;
+    }
   }
+  
+  // If all images in pool are used, reset the used images for this pool and pick first one
+  // This ensures we cycle through all images before repeating
+  selectedPool.forEach(img => usedImages.delete(img));
+  const selectedImage = selectedPool[0];
+  usedImages.add(selectedImage);
+  return selectedImage;
 };
 
 export async function GET(req: NextRequest) {
@@ -1426,7 +1603,7 @@ export async function GET(req: NextRequest) {
                       title: article.title,
                       description: cleanedDescription,
                       url: article.url,
-                      imageUrl: article.image_url || getRelevantImage(category, article.title, cleanedDescription),
+                      imageUrl: article.image_url || getUniqueRelevantImage(category, article.title, cleanedDescription),
                       publishedAt: article.published_at,
                       source: article.source,
                       category: category,
@@ -1552,7 +1729,7 @@ export async function GET(req: NextRequest) {
                     title: article.title,
                     description: cleanedDescription,
                     url: article.url ?? '',
-                    imageUrl: article.urlToImage || getRelevantImage(category, article.title, cleanedDescription),
+                    imageUrl: article.urlToImage || getUniqueRelevantImage(category, article.title, cleanedDescription),
                     publishedAt: article.publishedAt,
                     source: article.source.name,
                     category: category,

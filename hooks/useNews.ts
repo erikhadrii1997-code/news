@@ -13,6 +13,109 @@ interface UseNewsOptions {
 const STORAGE_KEY_PREFIX = 'pulse_news_cache_';
 const MAX_CACHED_ARTICLES_PER_CATEGORY = 5000; // Increased limit to keep all articles for a very long time
 
+// Global image tracking to ensure no duplicates in fallback articles
+const usedFallbackImages = new Set<string>();
+
+// Enhanced image selection function that tracks usage to prevent duplicates
+const getUniqueRelevantImage = (category: string, title: string = '', description: string = ''): string => {
+  const titleLower = title.toLowerCase();
+  const descriptionLower = description.toLowerCase();
+  const categoryLower = category.toLowerCase();
+  const contentText = `${titleLower} ${descriptionLower}`;
+  
+  // Define image pools for unique selection
+  const imageOptions = {
+    peace: [
+      'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=800&q=80', // Handshake/diplomacy
+      'https://images.unsplash.com/photo-1569173112611-52a7cd38bea9?w=800&q=80', // Peace dove
+      'https://images.unsplash.com/photo-1573164713988-8665fc963095?w=800&q=80', // United Nations
+      'https://images.unsplash.com/photo-1541692641319-981cc79ee10e?w=800&q=80', // World peace
+    ],
+    technology: [
+      'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&q=80', // Modern technology
+      'https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=800&q=80', // AI circuit
+      'https://images.unsplash.com/photo-1535378620166-273708d44e4c?w=800&q=80', // Digital innovation
+      'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&q=80', // Robot technology
+    ],
+    health: [
+      'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=800&q=80', // Medical/healthcare
+      'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&q=80', // Hospital
+      'https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=800&q=80', // Medical research
+      'https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=800&q=80', // Doctor consultation
+    ],
+    business: [
+      'https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=800&q=80', // Business/finance
+      'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800&q=80', // Stock market
+      'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80', // Corporate meeting
+      'https://images.unsplash.com/photo-1556761175-4b46a572b786?w=800&q=80', // Investment growth
+    ],
+    climate: [
+      'https://images.unsplash.com/photo-1569163139394-de4798aa62b6?w=800&q=80', // Environment/earth
+      'https://images.unsplash.com/photo-1611273426858-450d8e3c9fce?w=800&q=80', // Climate change
+      'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80', // Renewable energy
+      'https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=800&q=80', // Green forest
+    ],
+    education: [
+      'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=800&q=80', // Education/library
+      'https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=800&q=80', // University campus
+      'https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=800&q=80', // Graduation ceremony
+      'https://images.unsplash.com/photo-1509062522246-3755977927d7?w=800&q=80', // Classroom learning
+    ],
+    transportation: [
+      'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=800&q=80', // Transportation
+      'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=800&q=80', // Urban transit
+      'https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=800&q=80', // Railway system
+      'https://images.unsplash.com/photo-1541216970279-affbfdd55aa8?w=800&q=80', // Automotive industry
+    ],
+    default: [
+      'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&q=80', // Professional news
+      'https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=800&q=80', // Global news
+      'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=800&q=80', // Breaking news
+      'https://images.unsplash.com/photo-1559757146-f8b8b38dd75b?w=800&q=80', // World events
+    ]
+  };
+  
+  // Determine which image pool to use based on content
+  let selectedPool = imageOptions.default;
+  
+  if (contentText.includes('peace') || contentText.includes('agreement') || contentText.includes('treaty') || 
+      contentText.includes('diplomacy') || contentText.includes('cooperation') || contentText.includes('mediation')) {
+    selectedPool = imageOptions.peace;
+  } else if (contentText.includes('tech') || contentText.includes('ai') || contentText.includes('computer') || 
+             contentText.includes('digital') || contentText.includes('innovation')) {
+    selectedPool = imageOptions.technology;
+  } else if (contentText.includes('health') || contentText.includes('medical') || contentText.includes('hospital') || 
+             contentText.includes('doctor') || contentText.includes('healthcare')) {
+    selectedPool = imageOptions.health;
+  } else if (contentText.includes('business') || contentText.includes('market') || contentText.includes('economy') || 
+             contentText.includes('finance') || contentText.includes('investment')) {
+    selectedPool = imageOptions.business;
+  } else if (contentText.includes('climate') || contentText.includes('environment') || contentText.includes('green') || 
+             contentText.includes('sustainability') || contentText.includes('earth')) {
+    selectedPool = imageOptions.climate;
+  } else if (contentText.includes('education') || contentText.includes('school') || contentText.includes('university') || 
+             contentText.includes('learning') || contentText.includes('student')) {
+    selectedPool = imageOptions.education;
+  } else if (contentText.includes('transport') || contentText.includes('traffic') || contentText.includes('infrastructure') || 
+             contentText.includes('vehicle') || contentText.includes('road')) {
+    selectedPool = imageOptions.transportation;
+  }
+  
+  // Find first unused image from selected pool
+  for (const imageUrl of selectedPool) {
+    if (!usedFallbackImages.has(imageUrl)) {
+      usedFallbackImages.add(imageUrl);
+      return imageUrl;
+    }
+  }
+  
+  // If all images used, reset pool and use first one
+  selectedPool.forEach(img => usedFallbackImages.delete(img));
+  const selectedImage = selectedPool[0];
+  usedFallbackImages.add(selectedImage);
+  return selectedImage;
+};
+
 // Advanced smart image selection based on article content analysis
 const getRelevantImage = (category: string, title: string = '', description: string = ''): string => {
   const titleLower = title.toLowerCase();
@@ -395,7 +498,7 @@ export const useNews = (options: UseNewsOptions = {}) => {
           title: 'Historic Peace Agreement Signed Between Neighboring Nations',
           description: 'After decades of tension, two neighboring countries have signed a comprehensive peace agreement, marking a new era of cooperation and economic partnership in the region. The landmark accord addresses long-standing border disputes and establishes joint economic zones.',
           url: 'https://news.com/peace-agreement',
-          imageUrl: 'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=800&q=80',
+          imageUrl: getUniqueRelevantImage(cat, 'Historic Peace Agreement Signed Between Neighboring Nations', 'After decades of tension, two neighboring countries have signed a comprehensive peace agreement, marking a new era of cooperation and economic partnership in the region. The landmark accord addresses long-standing border disputes and establishes joint economic zones.'),
           publishedAt: new Date(now - 240000).toISOString(),
           source: 'International Times',
           category: cat,

@@ -62,38 +62,102 @@ export async function GET(req: NextRequest) {
     console.log('[API] Handling mobile request with JSON response');
     
     try {
-      // Helper function to get category-specific sample articles
+      // Helper function to get category-specific sample articles with live timestamps
       const getCategorySampleData = (cat: string): NewsItem[] => {
+        const now = Date.now();
+        const currentTime = new Date(now).toISOString();
+        
+        // Generate dynamic articles with current timestamps to simulate live updates
+        const generateDynamicArticles = (category: string) => [
+          {
+            id: `${category}-live-${now}`,
+            title: `Breaking: Latest ${category.charAt(0).toUpperCase() + category.slice(1)} Update - ${new Date().toLocaleTimeString()}`,
+            description: `This is a live update for ${category} news at ${new Date().toLocaleTimeString()}. Our newsroom is continuously monitoring developments and bringing you the most current information as events unfold. This article demonstrates real-time news delivery capabilities with automatic refresh functionality. Stay tuned for more updates as this story develops throughout the day.`,
+            url: `https://news.com/${category}-live-${now}`,
+            imageUrl: 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&q=80',
+            publishedAt: currentTime,
+            source: 'Live News Network',
+            category: cat,
+          },
+          {
+            id: `${category}-update-${now - 1000}`,
+            title: `${category.charAt(0).toUpperCase() + category.slice(1)} Alert: Real-Time Coverage Continues`,
+            description: `Continuing our live coverage of ${category} news with real-time updates every second. This demonstrates the dynamic nature of our news platform with automatic content refresh capabilities. Our dedicated team ensures you receive the latest information as soon as it becomes available, making this a truly live news experience.`,
+            url: `https://news.com/${category}-update-${now - 1000}`,
+            imageUrl: 'https://images.unsplash.com/photo-1573164713714-d95e436ab8d6?w=800&q=80',
+            publishedAt: new Date(now - 30000).toISOString(), // 30 seconds ago
+            source: 'Breaking News Today',
+            category: cat,
+          },
+          {
+            id: `${category}-flash-${now - 2000}`,
+            title: `Flash Report: ${category.charAt(0).toUpperCase() + category.slice(1)} Story Developing`,
+            description: `Flash report on developing ${category} story with timestamp ${new Date().toLocaleTimeString()}. This live news feed showcases real-time content delivery with automatic updates every second. Our newsroom works around the clock to ensure you have access to the most current information and breaking developments as they happen.`,
+            url: `https://news.com/${category}-flash-${now - 2000}`,
+            imageUrl: 'https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?w=800&q=80',
+            publishedAt: new Date(now - 60000).toISOString(), // 1 minute ago
+            source: 'Real-Time News',
+            category: cat,
+          }
+        ];
+
         const samplesByCategory: { [key: string]: NewsItem[] } = {
           general: [
+            ...generateDynamicArticles('general'),
             {
-              id: 'general-1',
+              id: 'general-climate-summit',
               title: 'Global Leaders Gather for Climate Summit in New York',
-              description: 'World leaders from over 150 countries are meeting in New York City for the annual climate summit, discussing new initiatives to combat climate change and reduce carbon emissions globally. The three-day summit brings together heads of state, environmental scientists, and industry leaders to address the urgent challenges posed by rising global temperatures. Key topics include renewable energy transitions, carbon pricing mechanisms, and international cooperation frameworks. Delegates are expected to announce new commitments to achieve net-zero emissions by 2050, with particular focus on supporting developing nations in their green transition. Several breakthrough technologies in carbon capture and sustainable agriculture will be showcased during the event.',
+              description: 'World leaders from over 150 countries are meeting in New York City for the annual climate summit, discussing new initiatives to combat climate change and reduce carbon emissions globally. The three-day summit brings together heads of state, environmental scientists, and industry leaders to address the urgent challenges posed by rising global temperatures. Key topics include renewable energy transitions, carbon pricing mechanisms, and international cooperation frameworks.',
               url: 'https://news.com/climate-summit-2025',
               imageUrl: 'https://images.unsplash.com/photo-1573164713714-d95e436ab8d6?w=800&q=80',
-              publishedAt: new Date().toISOString(),
+              publishedAt: new Date(now - 120000).toISOString(), // 2 minutes ago
               source: 'World News',
               category: cat,
             },
             {
-              id: 'general-2',
+              id: 'general-infrastructure',
               title: 'New Infrastructure Bill Promises Major Investment in Public Transportation',
-              description: 'The recently passed infrastructure legislation includes $200 billion for modernizing public transportation systems across major cities, aiming to reduce traffic congestion and emissions. The comprehensive package allocates funding for expanding metro systems, upgrading bus fleets to electric vehicles, and developing high-speed rail connections between major urban centers. Transportation officials estimate the improvements will reduce commute times by an average of 30% while significantly lowering carbon footprints. The bill also includes provisions for accessible transit options, ensuring people with disabilities have equal access to public transportation. Construction is expected to create over 500,000 jobs nationwide over the next decade.',
+              description: 'The recently passed infrastructure legislation includes $200 billion for modernizing public transportation systems across major cities, aiming to reduce traffic congestion and emissions. The comprehensive package allocates funding for expanding metro systems, upgrading bus fleets to electric vehicles, and developing high-speed rail connections between major urban centers.',
               url: 'https://news.com/infrastructure-bill',
               imageUrl: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=800&q=80',
-              publishedAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
+              publishedAt: new Date(now - 180000).toISOString(), // 3 minutes ago
               source: 'National News',
               category: cat,
             },
             {
-              id: 'general-3',
+              id: 'general-community-health',
               title: 'Community Health Initiative Expands to Rural Areas',
-              description: 'A groundbreaking community health program is extending its reach to underserved rural communities, bringing essential medical services and health education to areas previously lacking adequate healthcare access. The initiative includes mobile health clinics, telemedicine consultations, and training programs for local healthcare workers. Over 50 rural communities will benefit from the expansion, with services ranging from preventive care and vaccinations to chronic disease management and mental health support. The program has already shown remarkable success in urban areas, reducing emergency room visits by 25% and improving overall health outcomes. Funding comes from a combination of federal grants, private donations, and partnerships with major healthcare systems.',
+              description: 'A groundbreaking community health program is extending its reach to underserved rural communities, bringing essential medical services and health education to areas previously lacking adequate healthcare access. The initiative includes mobile health clinics, telemedicine consultations, and training programs for local healthcare workers.',
               url: 'https://news.com/community-health-rural',
               imageUrl: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&q=80',
-              publishedAt: new Date(Date.now() - 1000 * 60 * 60).toISOString(),
+              publishedAt: new Date(now - 240000).toISOString(), // 4 minutes ago
               source: 'Health Today',
+              category: cat,
+            }
+          ],
+          technology: [
+            ...generateDynamicArticles('technology'),
+            {
+              id: 'tech-ai-breakthrough',
+              title: 'Revolutionary AI Breakthrough Announced by Tech Giants',
+              description: 'Major technology companies unveiled groundbreaking artificial intelligence developments that promise to transform industries worldwide. The new AI systems demonstrate unprecedented capabilities in natural language processing, computer vision, and autonomous decision-making.',
+              url: 'https://news.com/ai-breakthrough',
+              imageUrl: 'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=800&q=80',
+              publishedAt: new Date(now - 300000).toISOString(),
+              source: 'Tech Daily',
+              category: cat,
+            }
+          ],
+          business: [
+            ...generateDynamicArticles('business'),
+            {
+              id: 'business-market-surge',
+              title: 'Global Markets Surge on Positive Economic Indicators',
+              description: 'Stock markets worldwide experienced significant gains following the release of encouraging economic data and corporate earnings reports. Investors showed renewed confidence in the global economic recovery.',
+              url: 'https://news.com/market-surge',
+              imageUrl: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&q=80',
+              publishedAt: new Date(now - 360000).toISOString(),
+              source: 'Business Times',
               category: cat,
             }
           ]

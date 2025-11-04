@@ -25,21 +25,23 @@ const ArticleView: React.FC<ArticleViewProps> = ({ article, onClose }) => {
 
   // Get a fallback image based on category or title content
   const getFallbackImage = () => {
-    const category = article.category?.toLowerCase() || '';
+    const category = article.category?.toLowerCase();
     const titleLower = article.title.toLowerCase();
     
-    if (category.includes('tech') || titleLower.includes('tech') || titleLower.includes('ai') || titleLower.includes('computer')) {
+    if (category?.includes('tech') || titleLower.includes('tech') || titleLower.includes('ai') || titleLower.includes('computer')) {
       return 'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=800&q=80';
-    } else if (category.includes('business') || titleLower.includes('business') || titleLower.includes('market') || titleLower.includes('economy')) {
+    } else if (category?.includes('business') || titleLower.includes('business') || titleLower.includes('market') || titleLower.includes('economy')) {
       return 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&q=80';
-    } else if (category.includes('sport') || titleLower.includes('sport') || titleLower.includes('football') || titleLower.includes('soccer')) {
+    } else if (category?.includes('sport') || titleLower.includes('sport') || titleLower.includes('football') || titleLower.includes('soccer')) {
       return 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800&q=80';
-    } else if (category.includes('health') || titleLower.includes('health') || titleLower.includes('medical')) {
+    } else if (category?.includes('health') || titleLower.includes('health') || titleLower.includes('medical')) {
       return 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&q=80';
-    } else if (category.includes('entertainment') || titleLower.includes('entertainment') || titleLower.includes('movie') || titleLower.includes('music')) {
+    } else if (category?.includes('entertainment') || titleLower.includes('entertainment') || titleLower.includes('movie') || titleLower.includes('music')) {
       return 'https://images.unsplash.com/photo-1598899134739-24c46f58b8c0?w=800&q=80';
-    } else if (category.includes('science') || titleLower.includes('science') || titleLower.includes('research')) {
+    } else if (category?.includes('science') || titleLower.includes('science') || titleLower.includes('research')) {
       return 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=800&q=80';
+    } else if (titleLower.includes('moon') || titleLower.includes('supermoon') || titleLower.includes('space') || titleLower.includes('astronomy') || titleLower.includes('planet') || titleLower.includes('solar') || titleLower.includes('nasa') || titleLower.includes('galaxy') || titleLower.includes('star') || titleLower.includes('astronaut')) {
+      return 'https://images.unsplash.com/photo-1446776877081-d282a0f896e2?w=800&q=80';
     } else if (titleLower.includes('climate') || titleLower.includes('environment') || titleLower.includes('summit')) {
       return 'https://images.unsplash.com/photo-1569163139394-de4798aa62b6?w=800&q=80';
     } else if (titleLower.includes('politics') || titleLower.includes('election') || titleLower.includes('government')) {

@@ -21,9 +21,47 @@ function HomePageContent() {
     pageSize: 100,
   });
 
+  // Get a fallback image based on category or article content
+  const getFallbackImage = (article: NewsItem): string => {
+    const category = article.category?.toLowerCase() || '';
+    const titleLower = (article.title || '').toLowerCase();
+    
+    // Category-based fallbacks with relevant photos
+    if (category.includes('tech') || titleLower.includes('tech') || titleLower.includes('ai') || titleLower.includes('computer')) {
+      return 'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=800&q=80';
+    } else if (category.includes('business') || titleLower.includes('business') || titleLower.includes('market') || titleLower.includes('economy')) {
+      return 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&q=80';
+    } else if (category.includes('sport') || titleLower.includes('sport') || titleLower.includes('football') || titleLower.includes('soccer')) {
+      return 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800&q=80';
+    } else if (category.includes('health') || titleLower.includes('health') || titleLower.includes('medical')) {
+      return 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&q=80';
+    } else if (category.includes('entertainment') || titleLower.includes('entertainment') || titleLower.includes('movie') || titleLower.includes('music')) {
+      return 'https://images.unsplash.com/photo-1598899134739-24c46f58b8c0?w=800&q=80';
+    } else if (category.includes('science') || titleLower.includes('science') || titleLower.includes('research')) {
+      return 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=800&q=80';
+    } else if (titleLower.includes('moon') || titleLower.includes('supermoon') || titleLower.includes('space') || titleLower.includes('astronomy') || titleLower.includes('planet') || titleLower.includes('solar') || titleLower.includes('nasa') || titleLower.includes('galaxy') || titleLower.includes('star') || titleLower.includes('astronaut')) {
+      return 'https://images.unsplash.com/photo-1446776877081-d282a0f896e2?w=800&q=80';
+    } else if (titleLower.includes('climate') || titleLower.includes('environment') || titleLower.includes('summit')) {
+      return 'https://images.unsplash.com/photo-1569163139394-de4798aa62b6?w=800&q=80';
+    } else if (titleLower.includes('politics') || titleLower.includes('election') || titleLower.includes('government')) {
+      return 'https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?w=800&q=80';
+    } else {
+      return 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&q=80';
+    }
+  };
+
   const filteredNews = news.filter((item) => {
     const t = (item.title || '').toLowerCase();
     const isDodgersBlueJays = t.includes('dodgers') && t.includes('blue jays');
+    
+    // Filter by category - only show articles for the current category
+    const matchesCategory = item.category === currentCategory || 
+                           (!item.category && currentCategory === 'general') ||
+                           (currentCategory === 'breaking' && (item.category === 'general' || !item.category));
+    
+    if (!matchesCategory) {
+      return false;
+    }
     
     // If searching, use ultra-intelligent search with flexible matching
     if (searchQuery && searchQuery.trim()) {
@@ -186,6 +224,7 @@ function HomePageContent() {
   const latestStories = filteredNews.slice(5, 17);
   const editorsPicks = filteredNews.slice(17, 21);
   const trending = filteredNews.slice(21, 26);
+  // Display ALL remaining articles (no limit)
   const moreNews = filteredNews.slice(26);
 
   const getCategoryBadge = (category: string = 'general') => {
@@ -311,9 +350,16 @@ function HomePageContent() {
                   <a href={`/read?u=${encodeURIComponent(heroArticle.url)}&t=${encodeURIComponent(heroArticle.title)}&d=${encodeURIComponent(heroArticle.description || '')}&i=${encodeURIComponent(heroArticle.imageUrl || '')}&p=${encodeURIComponent(heroArticle.publishedAt)}&s=${encodeURIComponent(heroArticle.source)}`} className="group block">
                     <div className="relative aspect-[16/10] overflow-hidden bg-gray-100">
                       <img
-                        src={heroArticle.imageUrl}
+                        src={heroArticle.imageUrl || getFallbackImage(heroArticle)}
                         alt={heroArticle.title}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        onError={(e) => {
+                          const img = e.currentTarget as HTMLImageElement;
+                          if (img.dataset.fallbackApplied !== 'true') {
+                            img.src = getFallbackImage(heroArticle);
+                            img.dataset.fallbackApplied = 'true';
+                          }
+                        }}
                       />
                       <div className="absolute top-4 left-4">
                         <span className={`${getCategoryBadge(heroArticle.category).bg} text-white px-3 py-1 text-xs font-bold tracking-wider`}>
@@ -329,9 +375,6 @@ function HomePageContent() {
                       <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 leading-tight group-hover:text-blue-600 transition-colors">
                         {heroArticle.title}
                       </h1>
-                      <p className="text-lg text-gray-700 mb-4 leading-relaxed">
-                        {heroArticle.description}
-                      </p>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center text-sm text-gray-500 space-x-4">
                           <time>{formatDate(heroArticle.publishedAt)}</time>
@@ -370,9 +413,16 @@ function HomePageContent() {
                   >
                     <div className="relative aspect-[4/3] overflow-hidden bg-gray-100 mb-3">
                       <img
-                        src={article.imageUrl}
+                        src={article.imageUrl || getFallbackImage(article)}
                         alt={article.title}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        onError={(e) => {
+                          const img = e.currentTarget as HTMLImageElement;
+                          if (img.dataset.fallbackApplied !== 'true') {
+                            img.src = getFallbackImage(article);
+                            img.dataset.fallbackApplied = 'true';
+                          }
+                        }}
                       />
                       <div className="absolute top-2 left-2">
                         <span className={`${getCategoryBadge(article.category).bg} text-white px-2 py-0.5 text-[10px] font-bold tracking-wider`}>
@@ -383,9 +433,6 @@ function HomePageContent() {
                     <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-3 group-hover:text-blue-600 transition-colors leading-tight">
                       {article.title}
                     </h3>
-                    <p className="text-sm text-gray-600 mb-3">
-                      {article.description}
-                    </p>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2 text-xs">
                         <span className="text-red-600 font-black uppercase">BREAKING NEWS</span>
@@ -423,9 +470,16 @@ function HomePageContent() {
                       <a href={`/read?u=${encodeURIComponent(article.url)}&t=${encodeURIComponent(article.title)}&d=${encodeURIComponent(article.description || '')}&i=${encodeURIComponent(article.imageUrl || '')}&p=${encodeURIComponent(article.publishedAt)}&s=${encodeURIComponent(article.source)}`} className="flex gap-5">
                         <div className="flex-shrink-0 w-48 h-32 bg-gray-100 overflow-hidden">
                           <img
-                            src={article.imageUrl}
+                            src={article.imageUrl || getFallbackImage(article)}
                             alt={article.title}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            onError={(e) => {
+                              const img = e.currentTarget as HTMLImageElement;
+                              if (img.dataset.fallbackApplied !== 'true') {
+                                img.src = getFallbackImage(article);
+                                img.dataset.fallbackApplied = 'true';
+                              }
+                            }}
                           />
                         </div>
                         <div className="flex-1">
@@ -441,9 +495,6 @@ function HomePageContent() {
                           <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors leading-tight">
                             {article.title}
                           </h3>
-                          <p className="text-sm text-gray-600 leading-relaxed mb-3">
-                            {article.description}
-                          </p>
                           <button 
                             onClick={(e) => {
                               e.preventDefault();
@@ -502,9 +553,16 @@ function HomePageContent() {
                       >
                         <div className="relative aspect-[16/9] overflow-hidden mb-2 bg-gray-800">
                           <img
-                            src={article.imageUrl}
+                            src={article.imageUrl || getFallbackImage(article)}
                             alt={article.title}
                             className="w-full h-full object-cover group-hover:opacity-80 transition-opacity"
+                            onError={(e) => {
+                              const img = e.currentTarget as HTMLImageElement;
+                              if (img.dataset.fallbackApplied !== 'true') {
+                                img.src = getFallbackImage(article);
+                                img.dataset.fallbackApplied = 'true';
+                              }
+                            }}
                           />
                         </div>
                         <h3 className="text-sm font-bold group-hover:text-red-400 transition-colors leading-tight line-clamp-2">
@@ -537,25 +595,162 @@ function HomePageContent() {
             </div>
             )}
 
-            {/* More News - Full Width Grid - Only show when NOT searching */}
-            {!searchQuery && moreNews.length > 0 && (
-              <section className="border-t-2 border-black pt-8">
-                <div className="flex items-center justify-between mb-6 border-b-2 border-black pb-2">
-                  <h2 className="text-2xl font-black text-black uppercase tracking-wide">More News</h2>
-                  <div className="w-16 h-0.5 bg-red-600"></div>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                  {moreNews.slice(0, 12).map((article) => (
-                    <NewsCard
-                      key={article.id}
-                      article={article}
-                    />
-                  ))}
-                </div>
-              </section>
-            )}
-          </>
-        )}
+            {/* All News - Display ALL articles in rows - Only show when NOT searching */}
+            {/* This section shows ALL previously loaded articles in addition to the categorized sections above */}
+            {!searchQuery && filteredNews.length > 0 && (
+              <>
+                <section className="border-t-4 border-black pt-12 mt-12">
+                  <div className="flex items-center justify-between mb-8 border-b-4 border-black pb-4">
+                    <h2 className="text-3xl font-black text-black uppercase tracking-wide">
+                      All Latest News ({filteredNews.length} total articles)
+                    </h2>
+                    <div className="w-24 h-1 bg-red-600"></div>
+                  </div>
+                  {/* Display all articles in rows - 4 columns grid, showing ALL previously loaded articles */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {filteredNews.map((article) => (
+                      <NewsCard
+                        key={article.id}
+                        article={article}
+                        onClick={() => setSelectedArticle(article)}
+                      />
+                    ))}
+                  </div>
+                </section>
+
+                {/* New Section After All Articles - Matching Theme */}
+                <section className="border-t-4 border-black pt-12 mt-12">
+                  <div className="flex items-center justify-between mb-8 border-b-4 border-black pb-4">
+                    <h2 className="text-3xl font-black text-black uppercase tracking-wide">
+                      Stay Updated
+                    </h2>
+                    <div className="w-24 h-1 bg-red-600"></div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    {/* Category Quick Access */}
+                    <div className="border-2 border-black p-6 bg-white hover:bg-gray-50 transition-colors duration-300">
+                      <div className="flex items-center mb-4">
+                        <div className="w-2 h-2 bg-red-600 rounded-full mr-3 animate-pulse"></div>
+                        <h3 className="text-xl font-black text-black uppercase tracking-wide">
+                          Explore Categories
+                        </h3>
+                      </div>
+                      <p className="text-gray-700 mb-6 leading-relaxed">
+                        Discover news across all categories. Browse through Technology, Business, Science, Health, Sports, and Entertainment to stay informed.
+                      </p>
+                      <div className="grid grid-cols-2 gap-2">
+                        {['Technology', 'Business', 'Science', 'Health', 'Sports', 'Entertainment'].map((cat) => (
+                          <button
+                            key={cat}
+                            onClick={() => handleCategoryChange(cat.toLowerCase())}
+                            className="px-4 py-2 text-sm font-black text-black border-2 border-gray-300 hover:border-black hover:bg-black hover:text-white transition-all duration-300 uppercase tracking-wide"
+                          >
+                            {cat}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                                         {/* Latest Updates Info */}
+                     <div className="border-2 border-black p-6 bg-white hover:bg-gray-50 transition-colors duration-300">
+                       <div className="flex items-center mb-4">
+                         <div className="w-2 h-2 bg-red-600 rounded-full mr-3 animate-pulse"></div>
+                         <h3 className="text-xl font-black text-black uppercase tracking-wide">
+                           Real-Time News
+                         </h3>
+                       </div>
+                                               <p className="text-gray-700 leading-relaxed">
+                          Our news feed updates automatically every 5 minutes, bringing you the latest breaking stories and updates worldwide.
+                        </p>
+                     </div>
+
+                    {/* Breaking News Alert */}
+                    <div className="border-2 border-black p-6 bg-black text-white hover:bg-gray-900 transition-colors duration-300">
+                      <div className="flex items-center mb-4">
+                        <div className="w-2 h-2 bg-red-600 rounded-full mr-3 animate-ping"></div>
+                        <h3 className="text-xl font-black text-white uppercase tracking-wide">
+                          Breaking News
+                        </h3>
+                      </div>
+                      <p className="text-gray-300 mb-6 leading-relaxed">
+                        Get instant notifications for breaking news and major stories. Stay ahead with real-time updates delivered directly to your feed.
+                      </p>
+                      <div className="flex items-center space-x-2 text-sm font-black uppercase tracking-wider">
+                        <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse"></div>
+                        <span className="text-white">LIVE UPDATES</span>
+                      </div>
+                    </div>
+                                      </div>
+                 </section>
+
+                                                                           {/* Editor's Picks Section - Clean List Format - Always Shows Latest 8 Articles */}
+                    <section className="border-t-4 border-black pt-12 mt-12">
+                      <div className="flex items-center justify-between mb-8 border-b-4 border-black pb-4">
+                        <h2 className="text-3xl font-black text-black uppercase tracking-wide">
+                          Editor's Picks
+                        </h2>
+                        <div className="w-24 h-1 bg-red-600"></div>
+                      </div>
+                      <div className="space-y-6">
+                        {/* Sort by published date (newest first) and take the latest 8 articles */}
+                        {[...filteredNews]
+                          .sort((a, b) => {
+                            const dateA = new Date(a.publishedAt).getTime();
+                            const dateB = new Date(b.publishedAt).getTime();
+                            return dateB - dateA; // Newest first
+                          })
+                          .slice(0, 8)
+                          .map((article) => {
+                          // Get the original title - if it doesn't already have source, add it
+                          let displayTitle = article.title;
+                          const sourceName = article.source || 'News';
+                          
+                          // Check if title already ends with source name pattern
+                          if (!article.title.includes(` - ${sourceName}`)) {
+                            // Remove any existing source suffix first
+                            const cleanedTitle = article.title.replace(/\s*-\s*[^-]+$/, '').trim();
+                            displayTitle = `${cleanedTitle} - ${sourceName}`;
+                          }
+                          
+                          const formattedDate = new Date(article.publishedAt).toLocaleDateString('en-US', {
+                            month: 'short',
+                            day: 'numeric',
+                            year: 'numeric'
+                          });
+
+                          return (
+                            <div
+                              key={article.id}
+                              className="group border-b-2 border-gray-200 pb-6 last:border-0 hover:border-black transition-colors duration-300"
+                            >
+                              <div className="flex items-start justify-between gap-4">
+                                <div className="flex-1">
+                                  <h3 className="text-xl font-bold text-black mb-2 group-hover:text-red-600 transition-colors duration-300 leading-tight">
+                                    {displayTitle}
+                                  </h3>
+                                  <p className="text-sm text-gray-600 font-medium">
+                                    {formattedDate}
+                                  </p>
+                                </div>
+                                <button
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    window.location.href = `/read?u=${encodeURIComponent(article.url)}&t=${encodeURIComponent(article.title)}&d=${encodeURIComponent(article.description || '')}&i=${encodeURIComponent(article.imageUrl || '')}&p=${encodeURIComponent(article.publishedAt)}&s=${encodeURIComponent(article.source)}`;
+                                  }}
+                                  className="bg-red-600 text-white px-6 py-2 text-sm font-black uppercase tracking-wider hover:bg-black transition-all duration-300 whitespace-nowrap"
+                                >
+                                  View
+                                </button>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                   </section>
+                </>
+              )}
+            </>
+          )}
 
         {!loading && filteredNews.length === 0 && !error && (
           <div className="text-center py-16">

@@ -33,12 +33,13 @@ const NewsCard: React.FC<NewsCardProps> = ({ article, onClick }) => {
       return 'https://images.unsplash.com/photo-1598899134739-24c46f58b8c0?w=800&q=80';
     } else if (category.includes('science') || titleLower.includes('science') || titleLower.includes('research')) {
       return 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=800&q=80';
+    } else if (titleLower.includes('moon') || titleLower.includes('supermoon') || titleLower.includes('space') || titleLower.includes('astronomy') || titleLower.includes('planet') || titleLower.includes('solar') || titleLower.includes('nasa') || titleLower.includes('galaxy') || titleLower.includes('star') || titleLower.includes('astronaut')) {
+      return 'https://images.unsplash.com/photo-1446776877081-d282a0f896e2?w=800&q=80';
     } else if (titleLower.includes('climate') || titleLower.includes('environment') || titleLower.includes('summit')) {
       return 'https://images.unsplash.com/photo-1569163139394-de4798aa62b6?w=800&q=80';
     } else if (titleLower.includes('politics') || titleLower.includes('election') || titleLower.includes('government')) {
       return 'https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?w=800&q=80';
     } else {
-      // Default news/world image
       return 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&q=80';
     }
   };
@@ -98,9 +99,6 @@ const NewsCard: React.FC<NewsCardProps> = ({ article, onClick }) => {
           <h3 className="text-base sm:text-lg font-black text-gray-900 mb-3 line-clamp-2 group-hover:text-blue-600 transition-colors duration-200 leading-tight">
             {title}
           </h3>
-          <p className="text-sm text-gray-700 leading-relaxed mb-4">
-            {article.description}
-          </p>
           
           {/* Read Button */}
           <div className="flex justify-between items-center">

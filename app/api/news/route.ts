@@ -2,6 +2,7 @@
 import { NextRequest } from 'next/server';
 import axios from 'axios';
 import { NewsItem } from '../../../lib/types';
+import { cleanSourceAttribution } from '../../../lib/articleExtractor';
 
 // Helper function to get fallback images based on category or content
 const getFallbackImage = (category: string, title: string = ''): string => {
@@ -19,7 +20,9 @@ const getFallbackImage = (category: string, title: string = ''): string => {
     return 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&q=80';
   } else if (titleLower.includes('entertainment') || titleLower.includes('movie') || titleLower.includes('music') || titleLower.includes('celebrity')) {
     return 'https://images.unsplash.com/photo-1598899134739-24c46f58b8c0?w=800&q=80';
-  } else if (titleLower.includes('science') || titleLower.includes('research') || titleLower.includes('study') || titleLower.includes('space')) {
+  } else if (titleLower.includes('moon') || titleLower.includes('supermoon') || titleLower.includes('space') || titleLower.includes('astronomy') || titleLower.includes('planet') || titleLower.includes('solar') || titleLower.includes('nasa') || titleLower.includes('galaxy') || titleLower.includes('star') || titleLower.includes('astronaut')) {
+    return 'https://images.unsplash.com/photo-1446776877081-d282a0f896e2?w=800&q=80';
+  } else if (titleLower.includes('science') || titleLower.includes('research') || titleLower.includes('study')) {
     return 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=800&q=80';
   } else if (titleLower.includes('climate') || titleLower.includes('environment') || titleLower.includes('summit') || titleLower.includes('earth')) {
     return 'https://images.unsplash.com/photo-1569163139394-de4798aa62b6?w=800&q=80';
@@ -52,6 +55,93 @@ export async function GET(req: NextRequest) {
   const category = searchParams.get('category') || 'general';
   const query = searchParams.get('q') || '';
   const pageSize = parseInt(searchParams.get('pageSize') || '50');
+  const isMobileRequest = searchParams.get('mobile') === 'true';
+
+  // Check if this is a mobile request - return JSON instead of SSE
+  if (isMobileRequest) {
+    console.log('[API] Handling mobile request with JSON response');
+    
+    try {
+      // Helper function to get category-specific sample articles
+      const getCategorySampleData = (cat: string): NewsItem[] => {
+        const samplesByCategory: { [key: string]: NewsItem[] } = {
+          general: [
+            {
+              id: 'general-1',
+              title: 'Global Leaders Gather for Climate Summit in New York',
+              description: 'World leaders from over 150 countries are meeting in New York City for the annual climate summit, discussing new initiatives to combat climate change and reduce carbon emissions globally. The three-day summit brings together heads of state, environmental scientists, and industry leaders to address the urgent challenges posed by rising global temperatures. Key topics include renewable energy transitions, carbon pricing mechanisms, and international cooperation frameworks. Delegates are expected to announce new commitments to achieve net-zero emissions by 2050, with particular focus on supporting developing nations in their green transition. Several breakthrough technologies in carbon capture and sustainable agriculture will be showcased during the event.',
+              url: 'https://news.com/climate-summit-2025',
+              imageUrl: 'https://images.unsplash.com/photo-1573164713714-d95e436ab8d6?w=800&q=80',
+              publishedAt: new Date().toISOString(),
+              source: 'World News',
+              category: cat,
+            },
+            {
+              id: 'general-2',
+              title: 'New Infrastructure Bill Promises Major Investment in Public Transportation',
+              description: 'The recently passed infrastructure legislation includes $200 billion for modernizing public transportation systems across major cities, aiming to reduce traffic congestion and emissions. The comprehensive package allocates funding for expanding metro systems, upgrading bus fleets to electric vehicles, and developing high-speed rail connections between major urban centers. Transportation officials estimate the improvements will reduce commute times by an average of 30% while significantly lowering carbon footprints. The bill also includes provisions for accessible transit options, ensuring people with disabilities have equal access to public transportation. Construction is expected to create over 500,000 jobs nationwide over the next decade.',
+              url: 'https://news.com/infrastructure-bill',
+              imageUrl: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=800&q=80',
+              publishedAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
+              source: 'National News',
+              category: cat,
+            },
+            {
+              id: 'general-3',
+              title: 'Community Health Initiative Expands to Rural Areas',
+              description: 'A groundbreaking community health program is extending its reach to underserved rural communities, bringing essential medical services and health education to areas previously lacking adequate healthcare access. The initiative includes mobile health clinics, telemedicine consultations, and training programs for local healthcare workers. Over 50 rural communities will benefit from the expansion, with services ranging from preventive care and vaccinations to chronic disease management and mental health support. The program has already shown remarkable success in urban areas, reducing emergency room visits by 25% and improving overall health outcomes. Funding comes from a combination of federal grants, private donations, and partnerships with major healthcare systems.',
+              url: 'https://news.com/community-health-rural',
+              imageUrl: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&q=80',
+              publishedAt: new Date(Date.now() - 1000 * 60 * 60).toISOString(),
+              source: 'Health Today',
+              category: cat,
+            }
+          ]
+        };
+
+        // Get sample data for the category, fallback to general if not found
+        return samplesByCategory[cat] || samplesByCategory.general || [];
+      };
+
+      let articles: NewsItem[] = getCategorySampleData(category);
+
+      // Filter articles based on search query if provided
+      if (query && query.trim()) {
+        const searchTerm = query.toLowerCase();
+        articles = articles.filter(article => 
+          article.title.toLowerCase().includes(searchTerm) ||
+          article.description.toLowerCase().includes(searchTerm) ||
+          article.source.toLowerCase().includes(searchTerm)
+        );
+      }
+
+      // Limit the number of articles
+      articles = articles.slice(0, pageSize);
+
+      console.log(`[API] Returning ${articles.length} articles for mobile (category: ${category})`);
+      
+      return new Response(JSON.stringify(articles), {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+        },
+      });
+
+    } catch (error) {
+      console.error('[API] Mobile request error:', error);
+      return new Response(JSON.stringify({ error: 'Failed to fetch news' }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+  }
+
+  // Desktop SSE implementation (original)
+  console.log('[API] Handling desktop request with SSE streaming');
 
   // Set headers for SSE
   const encoder = new TextEncoder();
@@ -1078,6 +1168,7 @@ export async function GET(req: NextRequest) {
                 categories: apiCategory,
                 limit: 100,
               },
+              timeout: 15000, // 15 second timeout for Render free tier
             });
 
             if (theNewsResponse.data && theNewsResponse.data.data && theNewsResponse.data.data.length > 0) {
@@ -1116,16 +1207,19 @@ export async function GET(req: NextRequest) {
                     }
                   }
                   
-                  return {
-                    id: article.uuid || article.url || `${index}-${Date.now()}`,
-                    title: article.title,
-                    description: fullDescription || 'No description available.',
-                    url: article.url,
-                    imageUrl: article.image_url || getFallbackImage(category, article.title),
-                    publishedAt: article.published_at,
-                    source: article.source,
-                    category: category,
-                  };
+                                      // Clean source attribution from description
+                    const cleanedDescription = fullDescription ? cleanSourceAttribution(fullDescription) : 'No description available.';
+                    
+                    return {
+                      id: article.uuid || article.url || `${index}-${Date.now()}`,
+                      title: article.title,
+                      description: cleanedDescription,
+                      url: article.url,
+                      imageUrl: article.image_url || getFallbackImage(category, article.title),
+                      publishedAt: article.published_at,
+                      source: article.source,
+                      category: category,
+                    };
                 });
               
               
@@ -1182,24 +1276,27 @@ export async function GET(req: NextRequest) {
                 q: query,
                 domains: 'bbc.co.uk,reuters.com,cnn.com,theguardian.com,wsj.com,techcrunch.com,bloomberg.com,nytimes.com,theverge.com,engadget.com',
               },
+              timeout: 15000, // 15 second timeout for Render free tier
             });
-          } else if (category === 'general') {
-            // General news from top headlines
-            response = await axios.get('https://newsapi.org/v2/top-headlines', {
-              params: {
-                ...commonParams,
-                country: 'us',
-              },
-            });
-          } else if (category === 'breaking' || category === 'headlines') {
-            // Top headlines
-            response = await axios.get('https://newsapi.org/v2/top-headlines', {
-              params: {
-                ...commonParams,
-                country: 'us',
-                category: category === 'breaking' ? 'general' : undefined,
-              },
-            });
+                      } else if (category === 'general') {
+              // General news from top headlines
+              response = await axios.get('https://newsapi.org/v2/top-headlines', {
+                params: {
+                  ...commonParams,
+                  country: 'us',
+                },
+                timeout: 15000, // 15 second timeout for Render free tier
+              });
+                      } else if (category === 'breaking' || category === 'headlines') {
+              // Top headlines
+              response = await axios.get('https://newsapi.org/v2/top-headlines', {
+                params: {
+                  ...commonParams,
+                  country: 'us',
+                  category: category === 'breaking' ? 'general' : undefined,
+                },
+                timeout: 15000, // 15 second timeout for Render free tier
+              });
           } else {
             // Category-based news
             const categoryMap: { [key: string]: string } = {
@@ -1220,6 +1317,7 @@ export async function GET(req: NextRequest) {
                 country: 'us',
                 category: apiCategory,
               },
+              timeout: 15000, // 15 second timeout for Render free tier
             });
           }
 
@@ -1260,16 +1358,19 @@ export async function GET(req: NextRequest) {
                   }
                 }
                 
-                return {
-                  id: article.url || `${index}-${Date.now()}`,
-                  title: article.title,
-                  description: fullDescription || 'No description available.',
-                  url: article.url ?? '',
-                  imageUrl: article.urlToImage || getFallbackImage(category, article.title),
-                  publishedAt: article.publishedAt,
-                  source: article.source.name,
-                  category: category,
-                };
+                                  // Clean source attribution from description
+                  const cleanedDescription = fullDescription ? cleanSourceAttribution(fullDescription) : 'No description available.';
+                  
+                  return {
+                    id: article.url || `${index}-${Date.now()}`,
+                    title: article.title,
+                    description: cleanedDescription,
+                    url: article.url ?? '',
+                    imageUrl: article.urlToImage || getFallbackImage(category, article.title),
+                    publishedAt: article.publishedAt,
+                    source: article.source.name,
+                    category: category,
+                  };
               });
 
             // Combine TheNewsAPI items with NewsAPI items

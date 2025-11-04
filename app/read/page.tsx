@@ -31,6 +31,8 @@ function ReadPageContent() {
       return 'https://images.unsplash.com/photo-1598899134739-24c46f58b8c0?w=800&q=80';
     } else if (titleLower.includes('science') || titleLower.includes('research')) {
       return 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=800&q=80';
+    } else if (titleLower.includes('moon') || titleLower.includes('supermoon') || titleLower.includes('space') || titleLower.includes('astronomy') || titleLower.includes('planet') || titleLower.includes('solar') || titleLower.includes('nasa') || titleLower.includes('galaxy') || titleLower.includes('star') || titleLower.includes('astronaut')) {
+      return 'https://images.unsplash.com/photo-1446776877081-d282a0f896e2?w=800&q=80';
     } else if (titleLower.includes('climate') || titleLower.includes('environment') || titleLower.includes('summit')) {
       return 'https://images.unsplash.com/photo-1569163139394-de4798aa62b6?w=800&q=80';
     } else if (titleLower.includes('politics') || titleLower.includes('election') || titleLower.includes('government')) {
@@ -87,7 +89,18 @@ function ReadPageContent() {
           </header>
 
           <div className="w-full h-56 sm:h-72 lg:h-96 bg-gradient-to-br from-gray-100 to-gray-50 overflow-hidden">
-            <img src={displayImage} alt={title} className="w-full h-full object-cover" />
+            <img 
+              src={displayImage} 
+              alt={title} 
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                const img = e.currentTarget as HTMLImageElement;
+                if (img.dataset.fallbackApplied !== 'true') {
+                  img.src = getFallbackImage();
+                  img.dataset.fallbackApplied = 'true';
+                }
+              }}
+            />
           </div>
 
           <div className="p-6 sm:p-8 lg:p-12">

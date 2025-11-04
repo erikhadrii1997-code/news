@@ -4,6 +4,44 @@ import axios from 'axios';
 import { NewsItem } from '../../../lib/types';
 import { cleanSourceAttribution } from '../../../lib/articleExtractor';
 
+// API Key configuration with automatic failover
+const API_KEYS = [
+  process.env.NEWS_API_KEY,
+  process.env.NEWS_API_KEY_BACKUP,
+  process.env.NEWS_API_KEY_THIRD
+].filter(Boolean); // Remove any undefined keys
+
+// Helper function to try API call with automatic failover
+const tryApiCall = async (url: string, timeout: number = 2000): Promise<any> => {
+  for (let i = 0; i < API_KEYS.length; i++) {
+    const apiKey = API_KEYS[i];
+    console.log(`[API] Trying API key ${i + 1}/${API_KEYS.length}`);
+    
+    try {
+      const fullUrl = url + apiKey;
+      const response = await axios.get(fullUrl, { timeout: timeout });
+      
+      if (response.data && response.data.articles) {
+        console.log(`[API] Success with API key ${i + 1}`);
+        return response.data;
+      }
+    } catch (error: any) {
+      console.log(`[API] Key ${i + 1} failed:`, error.message);
+      
+      // If this is the last key, we'll fallback to saved articles
+      if (i === API_KEYS.length - 1) {
+        console.log('[API] All API keys failed, using fallback articles');
+        throw new Error('All API keys exhausted');
+      }
+      
+      // Continue to next API key
+      continue;
+    }
+  }
+  
+  throw new Error('No valid API response received');
+};
+
 // Helper function to get fallback images based on category or content
 const getFallbackImage = (category: string, title: string = ''): string => {
   const titleLower = title.toLowerCase();
@@ -1331,36 +1369,17 @@ export async function GET(req: NextRequest) {
             apiKey: NEWS_API_KEY,
           };
 
-          // Fetch based on category or search query
+          // Fetch based on category or search query with automatic API failover
+          let newsApiUrl;
           if (query && query.trim()) {
             // Search mode - using everything endpoint with search query
-            response = await axios.get('https://newsapi.org/v2/everything', {
-              params: {
-                ...commonParams,
-                q: query,
-                domains: 'bbc.co.uk,reuters.com,cnn.com,theguardian.com,wsj.com,techcrunch.com,bloomberg.com,nytimes.com,theverge.com,engadget.com',
-              },
-              timeout: 15000, // 15 second timeout for Render free tier
-            });
-                      } else if (category === 'general') {
-              // General news from top headlines
-              response = await axios.get('https://newsapi.org/v2/top-headlines', {
-                params: {
-                  ...commonParams,
-                  country: 'us',
-                },
-                timeout: 15000, // 15 second timeout for Render free tier
-              });
-                      } else if (category === 'breaking' || category === 'headlines') {
-              // Top headlines
-              response = await axios.get('https://newsapi.org/v2/top-headlines', {
-                params: {
-                  ...commonParams,
-                  country: 'us',
-                  category: category === 'breaking' ? 'general' : undefined,
-                },
-                timeout: 15000, // 15 second timeout for Render free tier
-              });
+            newsApiUrl = `https://newsapi.org/v2/everything?q=${encodeURIComponent(query)}&language=en&sortBy=publishedAt&pageSize=${pageSize}&domains=bbc.co.uk,reuters.com,cnn.com,theguardian.com,wsj.com,techcrunch.com,bloomberg.com,nytimes.com,theverge.com,engadget.com&apiKey=`;
+          } else if (category === 'general') {
+            // General news from top headlines
+            newsApiUrl = `https://newsapi.org/v2/top-headlines?country=us&language=en&sortBy=publishedAt&pageSize=${pageSize}&apiKey=`;
+          } else if (category === 'breaking' || category === 'headlines') {
+            // Top headlines
+            newsApiUrl = `https://newsapi.org/v2/top-headlines?country=us&category=general&language=en&sortBy=publishedAt&pageSize=${pageSize}&apiKey=`;
           } else {
             // Category-based news
             const categoryMap: { [key: string]: string } = {
@@ -1372,21 +1391,15 @@ export async function GET(req: NextRequest) {
               entertainment: 'entertainment',
               general: 'general',
             };
-
             const apiCategory = categoryMap[category] || 'general';
-
-            response = await axios.get('https://newsapi.org/v2/top-headlines', {
-              params: {
-                ...commonParams,
-                country: 'us',
-                category: apiCategory,
-              },
-              timeout: 15000, // 15 second timeout for Render free tier
-            });
+            newsApiUrl = `https://newsapi.org/v2/top-headlines?country=us&category=${apiCategory}&language=en&sortBy=publishedAt&pageSize=${pageSize}&apiKey=`;
           }
 
-          if (response.data.status === 'ok') {
-            const newsApiItems: NewsItem[] = response.data.articles
+          // Try NewsAPI with automatic failover through all three keys
+          const newsApiResponse = await tryApiCall(newsApiUrl, 2000);
+          
+          if (newsApiResponse && newsApiResponse.status === 'ok') {
+            const newsApiItems: NewsItem[] = newsApiResponse.articles
               .map((article: ApiArticle, index: number) => {
                 // Combine ALL available text fields for maximum description length
                 let fullDescription = article.description || '';

@@ -15,32 +15,72 @@ const NewsCard: React.FC<NewsCardProps> = ({ article, onClick }) => {
 
   const title = article.title.replace(/\s*-\s*[^-]+$/, '');
 
-  // Get a fallback image based on category or article content
-  const getFallbackImage = () => {
+  // Get multiple fallback images based on category or article content
+  const getFallbackImages = () => {
     const category = article.category?.toLowerCase() || '';
     const titleLower = title.toLowerCase();
     
-    // Category-based fallbacks with relevant photos
+    // Return array of fallback images for multiple attempts
     if (category.includes('tech') || titleLower.includes('tech') || titleLower.includes('ai') || titleLower.includes('computer')) {
-      return 'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=800&q=80';
+      return [
+        'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&q=80',
+        'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=800&q=80',
+        'https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=800&q=80'
+      ];
     } else if (category.includes('business') || titleLower.includes('business') || titleLower.includes('market') || titleLower.includes('economy')) {
-      return 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&q=80';
+      return [
+        'https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=800&q=80',
+        'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&q=80',
+        'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800&q=80'
+      ];
     } else if (category.includes('sport') || titleLower.includes('sport') || titleLower.includes('football') || titleLower.includes('soccer')) {
-      return 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800&q=80';
+      return [
+        'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=800&q=80',
+        'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800&q=80',
+        'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=800&q=80'
+      ];
     } else if (category.includes('health') || titleLower.includes('health') || titleLower.includes('medical')) {
-      return 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&q=80';
+      return [
+        'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=800&q=80',
+        'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&q=80',
+        'https://images.unsplash.com/photo-1530497610245-94d3c16cda28?w=800&q=80'
+      ];
     } else if (category.includes('entertainment') || titleLower.includes('entertainment') || titleLower.includes('movie') || titleLower.includes('music')) {
-      return 'https://images.unsplash.com/photo-1598899134739-24c46f58b8c0?w=800&q=80';
+      return [
+        'https://images.unsplash.com/photo-1598899134739-24c46f58b8c0?w=800&q=80',
+        'https://images.unsplash.com/photo-1489641493513-ba4ee84ccea9?w=800&q=80',
+        'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800&q=80'
+      ];
     } else if (category.includes('science') || titleLower.includes('science') || titleLower.includes('research')) {
-      return 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=800&q=80';
+      return [
+        'https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=800&q=80',
+        'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=800&q=80',
+        'https://images.unsplash.com/photo-1628595351029-c2bf17511435?w=800&q=80'
+      ];
     } else if (titleLower.includes('moon') || titleLower.includes('supermoon') || titleLower.includes('space') || titleLower.includes('astronomy') || titleLower.includes('planet') || titleLower.includes('solar') || titleLower.includes('nasa') || titleLower.includes('galaxy') || titleLower.includes('star') || titleLower.includes('astronaut')) {
-      return 'https://images.unsplash.com/photo-1446776877081-d282a0f896e2?w=800&q=80';
+      return [
+        'https://images.unsplash.com/photo-1446776877081-d282a0f896e2?w=800&q=80',
+        'https://images.unsplash.com/photo-1517976547714-56872799c6fe?w=800&q=80',
+        'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&q=80'
+      ];
     } else if (titleLower.includes('climate') || titleLower.includes('environment') || titleLower.includes('summit')) {
-      return 'https://images.unsplash.com/photo-1569163139394-de4798aa62b6?w=800&q=80';
+      return [
+        'https://images.unsplash.com/photo-1569163139394-de4798aa62b6?w=800&q=80',
+        'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&q=80',
+        'https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=800&q=80'
+      ];
     } else if (titleLower.includes('politics') || titleLower.includes('election') || titleLower.includes('government')) {
-      return 'https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?w=800&q=80';
+      return [
+        'https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?w=800&q=80',
+        'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80',
+        'https://images.unsplash.com/photo-1545987796-200677ee1011?w=800&q=80'
+      ];
     } else {
-      return 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&q=80';
+      return [
+        'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&q=80',
+        'https://images.unsplash.com/photo-1495020689067-958852a7765e?w=800&q=80',
+        'https://images.unsplash.com/photo-1586880244386-d7d82ad9b13a?w=800&q=80'
+      ];
     }
   };
 
@@ -67,14 +107,21 @@ const NewsCard: React.FC<NewsCardProps> = ({ article, onClick }) => {
       <div className="w-full">
         <div className="relative w-full h-48 sm:h-52 md:h-48 bg-gray-200 overflow-hidden">
           <img 
-            src={article.imageUrl || getFallbackImage()} 
+            src={article.imageUrl || getFallbackImages()[0]} 
             alt={title} 
             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
             onError={(e) => {
               const img = e.currentTarget as HTMLImageElement;
-              if (img.dataset.fallbackApplied !== 'true') {
-                img.src = getFallbackImage();
-                img.dataset.fallbackApplied = 'true';
+              const fallbacks = getFallbackImages();
+              const currentAttempt = parseInt(img.dataset.attempt || '0', 10);
+              
+              if (currentAttempt < fallbacks.length - 1) {
+                img.dataset.attempt = (currentAttempt + 1).toString();
+                img.src = fallbacks[currentAttempt + 1];
+              } else if (!img.dataset.finalFallback) {
+                // Final fallback - reliable news image
+                img.src = 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&q=80';
+                img.dataset.finalFallback = 'true';
               }
             }}
           />

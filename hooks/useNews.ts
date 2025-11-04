@@ -1338,12 +1338,33 @@ export const useNews = (options: UseNewsOptions = {}) => {
         retryCount++;
         console.error(`API Error (attempt ${retryCount}/${maxRetries}):`, err);
         
-        // If we have news articles, don't show error - just log it
+        // CRITICAL: Always ensure Latest Stories and all categories have content when API fails
         if (news.length === 0) {
-          // Only show fallback articles if we have no articles at all
+          // Load fallback articles for the current category
           const fallbackArticles = getFallbackNews(category);
           setNews(fallbackArticles);
-          console.log(`[Fallback] Loaded fallback articles due to API error`);
+          console.log(`[Fallback] Loaded ${fallbackArticles.length} fallback articles for ${category} due to API error`);
+          
+          // Cache the fallback articles to ensure persistence
+          cacheArticles(fallbackArticles, category);
+        } else {
+          // Even if we have some articles, ensure we have enough content
+          const currentArticles = [...news];
+          const fallbackArticles = getFallbackNews(category);
+          
+          // Add unique fallback articles to fill gaps
+          fallbackArticles.forEach(fallback => {
+            const exists = currentArticles.some(article => article.url === fallback.url);
+            if (!exists && currentArticles.length < 15) {
+              currentArticles.push(fallback);
+            }
+          });
+          
+          if (currentArticles.length > news.length) {
+            setNews(currentArticles);
+            cacheArticles(currentArticles, category);
+            console.log(`[Enhanced] Added fallback articles to ensure content richness: ${currentArticles.length} total`);
+          }
         }
         
         setLoading(false);
